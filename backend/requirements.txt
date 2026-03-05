@@ -8,8 +8,8 @@ MarkupSafe==3.0.2
 click==7.1.2
 
 # -- Database ------------------------------------------------------------
-SQLAlchemy==1.4.0
-greenlet==3.1.1
+SQLAlchemy
+greenlet>=3.0.0
 psycopg2-binary>=2.9.0
 
 # -- Live and historical market data ------------------------------------
