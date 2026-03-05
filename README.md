@@ -8,7 +8,7 @@ Built with **Flask** · **SQLite** · **jugaad-data** · **yfinance** · **Chart
 
 ## About the Project
 
-**Golden Harbor** is a paper-trading web application that lets you practice stock trading risk-free using real-time NSE market data. Every user starts with a virtual balance of ₹1,00,000 and can buy/sell NIFTY 50 stocks, track their portfolio, and view historical OHLCV charts — all without spending a single real rupee.
+**Golden Harbor** is a paper-trading web application that lets you practice stock trading risk-free using real-time NSE market data. Every user starts with a virtual balance of ₹1,00,000 and can buy/sell NIFTY 50 stocks, track their portfolio, and view historical OHLCV charts - all without spending a single real rupee.
 
 The app is built entirely with Python (Flask) on the backend and vanilla JS + custom CSS on the frontend. No paid APIs or external services are required to get it running locally.
 
@@ -20,7 +20,7 @@ The app is built entirely with Python (Flask) on the backend and vanilla JS + cu
 |---|---|
 | 📈 Live Prices | NSE live quotes via `jugaad-data`, auto-refreshed every 15 s |
 | 🔐 Auth | Register / Login with hashed passwords (PBKDF2-SHA256) |
-| 💰 Virtual Balance | Start with ₹1,00,000 — buy deducts, sell credits |
+| 💰 Virtual Balance | Start with ₹1,00,000 - buy deducts, sell credits |
 | 🛡️ Validations | Cannot buy if insufficient balance · Cannot short-sell |
 | 📋 Watchlist | Add / remove any NIFTY 50 stock · Clear-all · Persisted per user |
 | 📊 Stock Charts | Historical OHLCV charts (line or candlestick, multiple time windows) |
@@ -34,7 +34,7 @@ The app is built entirely with Python (Flask) on the backend and vanilla JS + cu
 
 ```
 Stocks Simulation/
-├── app.py                  # Flask app — routes, DB models, data helpers
+├── app.py                  # Flask app - routes, DB models, data helpers
 ├── ind_nifty50list.csv     # NIFTY 50 company metadata (name, symbol, industry)
 ├── requirements.txt        # Python dependencies
 ├── .gitignore
@@ -42,9 +42,9 @@ Stocks Simulation/
 ├── templates/              # Jinja2 HTML templates
 │   ├── login.html          # Login page
 │   ├── register.html       # Registration page
-│   ├── main.html           # Dashboard — portfolio, history, balance
+│   ├── main.html           # Dashboard - portfolio, history, balance
 │   ├── allindices.html     # NIFTY 50 table with live polling & filters
-│   ├── eachstock.html      # Individual stock page — buy / sell
+│   ├── eachstock.html      # Individual stock page - buy / sell
 │   ├── watchlist.html      # Watchlist dropdown (loaded via AJAX)
 │   └── welcome.html        # Landing page
 │
@@ -99,7 +99,7 @@ Open your browser at **http://127.0.0.1:3001**
 
 ## Usage
 
-1. **Register** a new account — you start with ₹1,00,000 virtual balance.
+1. **Register** a new account - you start with ₹1,00,000 virtual balance.
 2. Go to **All Indices** to see live NIFTY 50 prices (auto-updates every 15 s).
 3. Click any stock to open its detail page and **Buy / Sell** using the sliders.
 4. Track your portfolio, transaction history, and balance on the **Dashboard**.
