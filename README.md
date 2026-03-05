@@ -30,6 +30,16 @@ The app is built entirely with Python (Flask) on the backend and vanilla JS + cu
 
 ---
 
+## Screenshots
+
+**Login Page**
+![Login Page](static/Readme1.png)
+
+**Stock Detail Page**
+![Stock Detail Page](static/Readme2.png)
+
+---
+
 ## Project Structure
 
 ```
