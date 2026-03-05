@@ -1,7 +1,7 @@
 # -- Core Flask ----------------------------------------------------------
-Flask
-Flask-SQLAlchemy
-Werkzeug
+Flask>=3.0.0
+Flask-SQLAlchemy>=3.0.0
+Werkzeug>=3.0.0
 itsdangerous
 Jinja2
 MarkupSafe
