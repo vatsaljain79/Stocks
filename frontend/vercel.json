@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "https://golden-harbor-backend.onrender.com/$1"
+    }
+  ]
+}

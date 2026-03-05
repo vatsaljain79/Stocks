@@ -1,0 +1,39 @@
+# -- Core Flask ----------------------------------------------------------
+Flask==2.0.3
+Flask-SQLAlchemy==2.5.1
+Werkzeug==2.0.3
+itsdangerous==2.0.1
+Jinja2==3.1.5
+MarkupSafe==3.0.2
+click==7.1.2
+
+# -- Database ------------------------------------------------------------
+SQLAlchemy==1.4.0
+greenlet==3.1.1
+psycopg2-binary>=2.9.0
+
+# -- Live and historical market data ------------------------------------
+jugaad-data==0.27
+yfinance>=0.2.0
+pandas==2.2.3
+numpy==2.2.1
+python-dateutil==2.9.0
+
+# -- HTTP / networking (used directly + jugaad-data deps) ---------------
+requests==2.32.3
+curl_cffi>=0.7.0
+frozendict==2.4.7
+
+# -- Environment / config ------------------------------------------------
+python-dotenv>=1.0.0
+
+# -- Deployment ---------------------------------------------------------
+gunicorn>=21.0.0
+flask-cors>=4.0.0
+
+# -- Misc utilities (indirect deps) -------------------------------------
+pytz>=2024.1
+certifi>=2024.0.0
+charset-normalizer>=3.0.0
+multitasking>=0.0.11
+packaging>=24.0

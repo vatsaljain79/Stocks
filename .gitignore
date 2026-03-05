@@ -1,57 +1,25 @@
-﻿# -- Python ------------------------------------------------------------------
+﻿# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.pyc
-*.so
 
-# -- Virtual environments ----------------------------------------------------
+# Environments
+.env
+.venv
 env/
 venv/
-.venv/
-ENV/
-env.bak/
 
-# -- Flask / app state -------------------------------------------------------
-instance/
-*.db
-*.sqlite
+# DBs
 *.sqlite3
+*.db
+users.db
+backend/users.db
+backend/instance/
 
-# -- Environment / secrets ---------------------------------------------------
-.env
-.env.*
-!.env.example
-
-# -- VS Code -----------------------------------------------------------------
-.vscode/
-tempCodeRunnerFile.py
-*.code-workspace
-
-# -- OS files ----------------------------------------------------------------
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
-desktop.ini
-
-# -- Distribution / packaging ------------------------------------------------
-dist/
-build/
-*.egg-info/
-*.egg
-wheels/
-
-# -- Pytest / coverage -------------------------------------------------------
-.pytest_cache/
-.coverage
-htmlcov/
-
-# -- Jupyter -----------------------------------------------------------------
-.ipynb_checkpoints/
-
-# -- Logs --------------------------------------------------------------------
-*.log
-logs/
-
-# -- Cache -------------------------------------------------------------------
-*.cache

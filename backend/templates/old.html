@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Webpage Title</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='eachstock.css') }}">
+</head>
+<body>
+    <header>
+        <div id="company-info">
+            <img src="{{ url_for('static', filename='logo.png') }}"alt="Company Logo" id="logo">
+            <span id="company-name" style="color: azure;">Golden Harbor</span>
+        </div>
+        <div id="user-info">
+            <div class="header-content">
+                <div class="dropdown">
+                    <button class="dropbtn">Arnav's Watchlist</button>
+                    <div class="dropdown-content">
+                        <!-- Add your dropdown menu items here -->
+                        <a href="#">Item 1</a>
+                        <a href="#">Item 2</a>
+                        <a href="#">Item 3</a>
+                    </div>
+                </div>
+            </div>
+            <span id="user-icon" style="margin-right: 20px;"><img src="{{ url_for('static', filename='icon.png') }}" alt="Company Logo" id="logo"></span> <!-- You can replace this with your desired user icon -->
+        </div>
+    </header>
+    <div id="breadcrumb" style="margin-top: 100px;">
+        <a href="/">Home</a> -> <a href="/allindexes">All Indices</a> -> Sensex
+    </div>
+    <div class="headertemp">
+        <h1>Sensex</h1>
+        <button class="watchlist-button">
+            <img class="watchlist-logo" src="{{ url_for('static', filename='watchlist.png') }}" alt="Watchlist Logo">
+            Watchlist
+        </button>
+    </div>
+    <h2 style="margin-left: 125px; margin-top: -10px;">Text</h2>
+    <div class="left-side">
+        <div style="margin-left: 50px;"><!-- <img src="{{ url_for('static', filename='back3.jpg') }}" alt="Your Image" style="margin-left: 100px; margin-right: 50px; width: 850px; height: 450px;"> -->
+        <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-3.3.3.min.js"></script>
+        {{ script | safe }}
+        {{ div | safe }}
+        </div>
+        <div class="buttons-container">
+            <div class="time-buttons">
+                <button class="active" onclick="changeTimeButton(this, '1D')">1D</button>
+                <button onclick="changeTimeButton(this, '1M')">1M</button>
+                <button onclick="changeTimeButton(this, '1W')">1W</button>
+                <button onclick="changeTimeButton(this, '1Y')">1Y</button>
+                <button onclick="changeTimeButton(this, '5Y')">5Y</button>
+            </div>
+            <button class="toggle-button" onclick="toggleImage()">
+                <img id="toggleImage" src="{{ url_for('static', filename='line.png') }}" alt="Toggle Image">
+            </button>
+        </div>
+    </div>
+
+    <div class="right-side">
+        <h2 style="margin-top: 150px;">Table Title</h2>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        function changeTimeButton(button, time) {
+            // Remove 'active' class from all buttons
+            document.querySelectorAll('.time-buttons button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add 'active' class to the clicked button
+            button.classList.add('active');
+
+            // Add your logic to handle the selected time (e.g., fetch data based on the selected time)
+            console.log(`Selected Time: ${time}`);
+            // $.ajax({url:'/update_month',type:'GET'});
+            // location.reload();
+            
+            $.ajax({url:'/update_graph_time',type:'POST',data:{'time':time},success:function(data){location.reload();}});
+            location.reload();
+           
+
+        }
+
+        function toggleImage() {
+            // Toggle between two images
+            const imageElement = document.getElementById('toggleImage');
+            const currentImage = imageElement.src;
+
+            if (currentImage.includes("{{ url_for('static', filename='line.png') }}")) {
+                imageElement.src = "{{ url_for('static', filename='candle.png') }}";
+            } else {
+                imageElement.src = "{{ url_for('static', filename='line.png') }}";
+            }
+
+            console.log('Toggle Image Button Pressed');
+        }
+    </script>
+</body>
+</html>

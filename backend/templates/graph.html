@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-3.3.3.min.js"></script>
+    <!-- <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.3.3.min.js"></script> -->
+
+    <title>{{symbol}}</title>
+    
+</head>
+<body>
+    <h1>Bokeh Plot</h1>
+    {{ script | safe }}
+    {{ div | safe }}
+    <button class="round-button" id="HI" onclick="add_graph(this)">click me</button>
+
+</body>
+
+<script>
+    function add_graph(){
+
+    }
+</script>
+</html>
