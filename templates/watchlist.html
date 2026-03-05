@@ -1,10 +1,36 @@
-<div class="dropdown-content" id="watch">
-    <!-- Add your dropdown menu items here -->
-    
-    
+<div id="watch" style="display:block; margin:0; padding:0; border:none; box-shadow:none; border-radius:0;">
 </div>
+<button id="clearWlBtn" onclick="clearAllWatchlist()" style="
+    display:block; width:calc(100% - 16px); margin:6px 8px 4px;
+    padding:6px 0; border:none; border-radius:6px;
+    background:#e53935; color:#fff; font-size:0.78rem;
+    font-weight:600; letter-spacing:.4px; cursor:pointer;
+    font-family:inherit; transition:background .15s;
+" onmouseover="this.style.background='#c62828'" onmouseout="this.style.background='#e53935'">&#10005; Clear All Watchlist</button>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     $('#watch').html('{{state_watch | safe}}')
-    
+
+    // Hide clear button if already empty
+    (function() {
+        var html = '{{state_watch | safe}}';
+        if (html.indexOf('Empty !') !== -1) {
+            var btn = document.getElementById('clearWlBtn');
+            if (btn) btn.style.display = 'none';
+        }
+    })();
+
+    function clearAllWatchlist() {
+        $.ajax({ url: '/clear_watchlist', type: 'POST', success: function() {
+            // Reset the watch div
+            $('#watch').html('<a href="#">Empty !</a>');
+            // Hide the clear button
+            document.getElementById('clearWlBtn').style.display = 'none';
+            // Reset all watchlist toggle buttons in the parent page
+            document.querySelectorAll('.active-wl').forEach(function(btn) {
+                btn.innerHTML = '+';
+                btn.classList.remove('active-wl');
+            });
+        }});
+    }
 </script>

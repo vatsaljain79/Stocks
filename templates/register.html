@@ -1,31 +1,359 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Register</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register &ndash; Golden Harbor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ── Left panel ─────────────────────── */
+        .panel-left {
+            flex: 1.1;
+            position: relative;
+            overflow: hidden;
+        }
+        .panel-left img.bg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .panel-left .overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg,
+                rgba(5,173,117,.55) 0%,
+                rgba(0,0,0,.82) 100%);
+        }
+        .branding {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+        }
+        .branding .logo-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 48px;
+        }
+        .branding .logo-row img { width: 52px; filter: brightness(2); }
+        .branding .logo-row span {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .branding h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+            max-width: 460px;
+        }
+        .branding h1 em {
+            font-style: normal;
+            color: rgb(5,173,117);
+        }
+        .branding p {
+            margin-top: 20px;
+            font-size: 1.05rem;
+            color: rgba(255,255,255,.72);
+            max-width: 400px;
+            line-height: 1.65;
+        }
+        .steps {
+            margin-top: 52px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .step-num {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgb(5,173,117);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .step-text strong { display: block; color: #fff; font-size: 15px; margin-bottom: 2px; }
+        .step-text span { color: rgba(255,255,255,.6); font-size: 13px; }
+
+        /* ── Right panel ─────────────────────── */
+        .panel-right {
+            width: 480px;
+            flex-shrink: 0;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 56px;
+        }
+        .form-box { width: 100%; }
+        .form-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 6px;
+        }
+        .form-sub {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 36px;
+        }
+        .form-sub a { color: rgb(5,173,117); text-decoration: none; font-weight: 500; }
+        .form-sub a:hover { text-decoration: underline; }
+
+        .field { margin-bottom: 20px; }
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 7px;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+        .field input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #111;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            background: #fafafa;
+        }
+        .field input:focus {
+            border-color: rgb(5,173,117);
+            box-shadow: 0 0 0 3px rgba(5,173,117,.12);
+            background: #fff;
+        }
+
+        .balance-notice {
+            background: rgba(5,173,117,.08);
+            border: 1px solid rgba(5,173,117,.25);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #2d7a55;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .balance-notice .icon { font-size: 18px; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: rgb(5,173,117);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background .2s, transform .1s;
+        }
+        .btn-submit:hover { background: #04b87c; transform: translateY(-1px); }
+        .btn-submit:active { transform: translateY(0); }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+            color: #ccc;
+            font-size: 13px;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; height: 1px; background: #eee;
+        }
+
+        .btn-login-link {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            transition: border-color .2s, color .2s;
+        }
+        .btn-login-link:hover { border-color: rgb(5,173,117); color: rgb(5,173,117); }
+
+        .flash-list {
+            list-style: none;
+            background: #f0fdf7;
+            border: 1px solid rgba(5,173,117,.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1a7a50;
+        }
+
+        /* ── IST clock ───────────────────────── */
+        .ist-clock {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 44px;
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 30px;
+            padding: 8px 18px;
+            backdrop-filter: blur(6px);
+        }
+        .ist-clock .clock-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgb(5,173,117);
+            box-shadow: 0 0 0 0 rgba(5,173,117,.6);
+            animation: pulse 1.8s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(5,173,117,.6); }
+            50%      { box-shadow: 0 0 0 6px rgba(5,173,117,0); }
+        }
+        .ist-clock .clock-time {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: .3px;
+            font-variant-numeric: tabular-nums;
+        }
+        .ist-clock .clock-label {
+            font-size: 11px;
+            color: rgba(255,255,255,.5);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        @media (max-width: 860px) {
+            .panel-left { display: none; }
+            .panel-right { width: 100%; padding: 40px 28px; }
+        }
+    </style>
 </head>
-<body class ="bdy">
-    <div class="contain">
-        <div class="login">
-            <h1 class="text_register">Register </h1>
+<body>
+    <!-- Left branding panel -->
+    <div class="panel-left">
+        <img class="bg" src="{{ url_for('static', filename='back3.jpg') }}" alt="">
+        <div class="overlay"></div>
+        <div class="branding">
+            <div class="logo-row">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+                <span>Golden Harbor</span>
+            </div>
+            <h1>Your journey to <em>smarter</em> investing starts here.</h1>
+            <p>Join Golden Harbor and practice with real NSE market data, a virtual trading portfolio, and zero financial risk.</p>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <div class="step-text">
+                        <strong>Create your account</strong>
+                        <span>Free, instant, no credit card needed</span>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-text">
+                        <strong>Get &#8377;1,00,000 virtual balance</strong>
+                        <span>Start trading all 50 NIFTY stocks immediately</span>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-text">
+                        <strong>Track your portfolio</strong>
+                        <span>Watchlist, buy/sell history, live prices</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ist-clock">
+                <span class="clock-dot"></span>
+                <span class="clock-time" id="ist-time">--:--:--</span>
+                <span class="clock-label">IST &bull; India</span>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function tickIST() {
+            function pad(n) { return String(n).padStart(2, '0'); }
+            function update() {
+                var now = new Date();
+                var ist = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+                var h = ist.getHours(), m = ist.getMinutes(), s = ist.getSeconds();
+                var ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12 || 12;
+                document.getElementById('ist-time').textContent =
+                    pad(h) + ':' + pad(m) + ':' + pad(s) + ' ' + ampm;
+            }
+            update();
+            setInterval(update, 1000);
+        })();
+    </script>
+
+    <!-- Right form panel -->
+    <div class="panel-right">
+        <div class="form-box">
+            <h2 class="form-title">Create account</h2>
+            <p class="form-sub">Already have one? <a href="/">Sign in &rarr;</a></p>
+
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                    <ul class="error-messages">
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
+                    <ul class="flash-list">
+                        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
                     </ul>
                 {% endif %}
             {% endwith %}
-            <form action="/register" method="post">
-                <input type="text" name="username" placeholder="Username" required="required" />
-                <input type="password" name="password" placeholder="Password" required="required" />
-                <button type="submit" class="btn_submit">Register Me !</button>
-                
-            </form>
-            <a href="/" class="btn_tologin">Take me to Login Page</a>
-        </div>                                                                                                                              
-    </div>
 
+            <div class="balance-notice">
+                <span class="icon">&#127873;</span>
+                <span>You'll receive <strong>&#8377;1,00,000</strong> virtual trading balance on sign-up.</span>
+            </div>
+
+            <form action="/register" method="post">
+                <div class="field">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Choose a username" required>
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Create a password" required>
+                </div>
+                <button type="submit" class="btn-submit">Create Account &rarr;</button>
+            </form>
+
+            <div class="divider">or</div>
+            <a href="/" class="btn-login-link">Back to Login</a>
+        </div>
+    </div>
 </body>
 </html>

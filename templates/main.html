@@ -1,353 +1,334 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Webpage Title</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Dashboard &ndash; Golden Harbor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 </head>
 <body>
-    <header>
-        <div id="company-info">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" id="logo">
-            <span id="company-name" style="color: azure;"><a href="/main" style="text-decoration: none; color:white">Golden Harbor</a></span>
+<!-- ── Navbar ────────────────────────────────────────────────────── -->
+<header class="navbar">
+    <div class="nav-brand">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        <a href="/main" class="nav-brand-name">Golden Harbor</a>
+    </div>
+    <div class="nav-search search-container">
+        <button id="search-btn" class="search-icon-btn">
+            <img src="{{ url_for('static', filename='glass.png') }}" alt="Search">
+        </button>
+        <input type="text" id="search-input" placeholder="Search stocks&hellip;">
+        <div class="search-suggestions" id="searchSuggestions"></div>
+    </div>
+    <div class="nav-right">
+        <div class="dropdown">
+            <button class="dropbtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                {{user}}&rsquo;s Watchlist
+            </button>
+            <div class="dropdown-content" id="drop1"></div>
         </div>
-        <div id="search-box" class="search-container">
-            <button id="search-btn"><img src="{{ url_for('static', filename='glass.png') }}" alt="Search" style="width: 40px;"></button>
-            <input type="text" id="search-input" placeholder="What do you want to analyze">
-            <div class="search-suggestions" id="searchSuggestions"></div>
+        <a href="/logout" class="logout-btn">
+            <img src="{{ url_for('static', filename='icon.png') }}" alt="Logout">
+            <span>Logout</span>
+        </a>
+    </div>
+</header>
+
+<!-- ── Hero Slideshow ────────────────────────────────────────────── -->
+<section class="hero">
+    <div class="hero-slides" id="slideshow">
+        <img src="{{ url_for('static', filename='back3.jpg') }}" alt="">
+        <img src="{{ url_for('static', filename='back1.jpg') }}" alt="">
+        <img src="{{ url_for('static', filename='back2.jpg') }}" alt="">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <p class="hero-tag">NSE Live &bull; NIFTY 50</p>
+        <h1 class="hero-title">&ldquo;Where Strategy<br>meets Success&rdquo;</h1>
+        <a href="/allindexes" class="hero-cta">Browse All Stocks &rarr;</a>
+    </div>
+    <div class="hero-dots" id="heroDots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </div>
+</section>
+
+<!-- ── Main content wrapper ──────────────────────────────────────── -->
+<main class="page-wrap">
+
+    <!-- ── Featured stock cards ───────────────────── -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Market Highlights</h2>
+            <a href="/allindexes" class="section-link">All indices &rarr;</a>
         </div>
-        <div id="user-info">
-            <div class="header-content">
-                <div class="dropdown">
-                    <h2 class="dropbtn">{{user}}'s Watchlist</h2>
-                    <div class="dropdown-content" id="drop1">
+        <div class="stock-cards">
+            {% set featured = [
+                ('ASIANPAINT', 'Asian Paints Ltd.', data['NIFTY 50']),
+                ('TCS',        'Tata Consultancy Services', data['TCS']),
+                ('SBIN',       'State Bank of India', data['SBIN'])
+            ] %}
+            {% for sym, name, d in featured %}
+            <a href="/allindexes/{{sym}}" class="stock-card">
+                <div class="sc-top">
+                    <span class="sc-name">{{name}}</span>
+                    <span class="sc-sym">{{sym}}</span>
+                </div>
+                <div class="sc-price">{{d['lastPrice']}}</div>
+                <div class="sc-change {% if int(d['change'],2) >= 0 %}pos{% else %}neg{% endif %}">
+                    {% if int(d['change'],2) >= 0 %}&#9650;{% else %}&#9660;{% endif %}
+                    {{int(d['change'],2)}} &nbsp;({{int(d['pChange'],2)}}%)
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- ── Inventory ──────────────────────────────── -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Your Inventory</h2>
+            <span class="section-badge">{{curr_stocks|length}} stock(s)</span>
+        </div>
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Symbol</th>
+                        <th>Live Price</th>
+                        <th>Qty</th>
+                        <th>Watchlist</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in curr_stocks %}
+                    <tr>
+                        <td><a href="/allindexes/{{q}}" class="tbl-link">{{ all_stocks.index[all_stocks['Symbol'] == q][0] }}</a></td>
+                        <td><span class="chip">{{q}}</span></td>
+                        <td class="num">&#8377; {{f(q)['lastPrice']}}</td>
+                        <td class="num bold">{{curr_stocks[q]}}</td>
+                        <td>
+                            {% if all_stocks.index[all_stocks['Symbol'] == q][0] in curr %}
+                            <button class="round-button active-wl" id="{{ all_stocks.index[all_stocks['Symbol'] == q][0] }}" onclick="toggleWatchlist(this)">&#10004;</button>
+                            {% else %}
+                            <button class="round-button" id="{{ all_stocks.index[all_stocks['Symbol'] == q][0] }}" onclick="toggleWatchlist(this)">+</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if curr_stocks == {} %}
+                    <tr><td colspan="5" class="empty-row">No stocks in inventory yet.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ── Two-column history ─────────────────────── -->
+    <div class="history-grid">
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Buy History</h2>
+                <span class="section-badge buy-badge">{{stocks_bought|length}}</span>
+            </div>
+            <div class="table-card">
+                <table>
+                    <thead>
+                        <tr><th>Company</th><th>Price</th><th>Qty</th><th>Date &amp; Time</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for q in stocks_bought %}
+                        <tr>
+                            <td><a href="/allindexes/{{q[0]}}" class="tbl-link">{{ all_stocks.index[all_stocks['Symbol'] == q[0]][0] }}</a></td>
+                            <td class="num">&#8377;&nbsp;{{q[1]}}</td>
+                            <td class="num bold">{{q[2]}}</td>
+                            <td class="ts">{{q[3]}}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if stocks_bought == [] %}
+                        <tr><td colspan="4" class="empty-row">No purchases yet.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Sell History</h2>
+                <span class="section-badge sell-badge">{{stocks_sold|length}}</span>
+            </div>
+            <div class="table-card">
+                <table>
+                    <thead>
+                        <tr><th>Company</th><th>Price</th><th>Qty</th><th>Date &amp; Time</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for q in stocks_sold %}
+                        <tr>
+                            <td><a href="/allindexes/{{q[0]}}" class="tbl-link">{{ all_stocks.index[all_stocks['Symbol'] == q[0]][0] }}</a></td>
+                            <td class="num">&#8377;&nbsp;{{q[1]}}</td>
+                            <td class="num bold">{{q[2]}}</td>
+                            <td class="ts">{{q[3]}}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if stocks_sold == [] %}
+                        <tr><td colspan="4" class="empty-row">No sales yet.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- ── Balance card ───────────────────────────── -->
+    <section class="section" id="money-section">
+        <div class="section-header">
+            <h2 class="section-title">Your Balance</h2>
+        </div>
+        <div class="balance-wrap">
+            <div class="balance-card-main">
+                <div class="balance-left">
+                    <p class="balance-label">Available Funds</p>
+                    <p id="current-balance" class="balance-amount">{{ bal | inr }}</p>
+                    <p class="balance-sub">Virtual trading balance</p>
+                </div>
+                <button class="btn-reset" onclick="resetBalance()">&#8635; Reset to &#8377;1L</button>
+            </div>
+            <div class="money-actions">
+                <div class="action-box">
+                    <label for="add-money">Add Money</label>
+                    <div class="money-input-row">
+                        <span class="currency-sym">&#8377;</span>
+                        <input type="number" id="add-money" class="money-input" placeholder="Amount">
+                        <button class="money-button btn-add" onclick="addMoney()">Add</button>
+                    </div>
+                </div>
+                <div class="action-box">
+                    <label for="extract-money">Withdraw Money</label>
+                    <div class="money-input-row">
+                        <span class="currency-sym">&#8377;</span>
+                        <input type="number" id="extract-money" class="money-input" placeholder="Amount">
+                        <button class="money-button btn-extract" onclick="extractMoney()">Withdraw</button>
                     </div>
                 </div>
             </div>
-            <span id="user-icon" style="margin-right: 60px;">
-                <a href="/logout">
-                    <img src="{{ url_for('static', filename='icon.png') }}" alt="Company Logo" id="logo" title="Logout" style="display: block;">
-                    <p style="text-align: center; color: azure; font-size: 10px; margin-top: -5px; margin-left: -10px;">Logout</p>
-                </a>
-            </span>
         </div>
-    </header>
-    <div id="background-image">
-        <div id="slideshow">
-            <img src="{{ url_for('static', filename='back3.jpg') }}" alt="Image 1">
-            <img src="{{ url_for('static', filename='back1.jpg') }}" alt="Image 2">
-            <img src="{{ url_for('static', filename='back2.jpg') }}" alt="Image 3">
-        </div>
-        <div id="overlay">
-            <div id="overlay-text">
-                <p style="font-family: Roboto Slab Light; font-size: 50px; font-style: italic;">"Where Strategy meets Success"</p>
-            </div>
-        </div>
-        <div id="overlay-text-1">
-            <div class="line" id="line1"></div>
-            <div class="line" id="line2"></div>
-            <div class="line" id="line3"></div>
-        </div>
-    </div>
-    <div>
-        <div style="display: flex;justify-content: space-between; margin-top: 70px; margin-left: 100px; margin-right: 150px;">
-            <h3>Stocks</h3>
-            <h3><a href="/allindexes" style="text-decoration: none; color: rgb(5, 173, 117);">All indices</a></h3> 
-        </div>
-        <div class="container">
-            <div class="box">
-                <a href="/allindexes/ASIANPAINT" style="text-decoration: none; color: black;"><h4 style="margin-left: 20px;">Asian Paints Ltd.</h4></a>
-                <h4 style="margin-left: 20px;"><span>{{data['NIFTY 50']['lastPrice']}}</span>  <span style="color: rgb(5, 173, 117);">{{int(data['NIFTY 50']['change'],2)}}  ({{int(data['NIFTY 50']['pChange'],2)}})</span>  </h4>
-            </div>
-            <div class="box">
-                <a href="/allindexes/TCS" style="text-decoration: none; color: black;"><h4 style="margin-left: 20px;">TCS</h4></a>
-                <h4 style="margin-left: 20px;"><span>{{data['TCS']['lastPrice']}}</span> <span style="color: rgb(5, 173, 117);">{{int(data['TCS']['change'],2)}} ({{int(data['TCS']['pChange'],2)}})</span>  </h4>
-            </div>
-            <div class="box">
-                <a href="/allindexes/SBIN" style="text-decoration: none; color: black;"><h4 style="margin-left: 20px;">SBIN</h4></a>
-                <h4 style="margin-left: 20px;"><span>{{data['SBIN']['lastPrice']}}</span> <span style="color: rgb(5, 173, 117);">{{int(data['SBIN']['change'],2)}} ({{int(data['SBIN']['pChange'],2)}})</span>  </h4>
-            </div>
-        </div>
-    </div>
-    <div class="stocks-table" style="margin-bottom: 100px;">
-        <h3 style="margin-top: 90px;">Your Inventory</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 135px;">Company Name</th>
-                    <th style="width: 115px;">Live Price</th>
-                    <th style="width: 115px;">Quantity </th>
-                    <th style="width: 115px;">Watchlist</th>
-                </tr>
-            </thead>
-            <tbody>
-                {%for q in curr_stocks%}
-                <tr>
-                    <td><a href="/allindexes/{{q}}" style="text-decoration: none; color: rgb(5, 173, 117);">{{ all_stocks.index[all_stocks['Symbol'] == q][0] }}</a></td>
-                    <td>{{f(q)['lastPrice']}}</td>
-                    <td>{{curr_stocks[q]}}</td>
-                    {%if all_stocks.index[all_stocks['Symbol'] == q][0] in curr%}
-                    <td><button class="round-button" id="{{ all_stocks.index[all_stocks['Symbol'] == q][0] }}" onclick="toggleWatchlist(this)" style="background-color: rgb(5, 173, 117);">✔</button></td>
-                    {%else%}
-                    <td><button class="round-button" id="{{ all_stocks.index[all_stocks['Symbol'] == q][0] }}"onclick="toggleWatchlist(this)">+</button></td>
-                    {%endif%}
-                    
-                {%endfor%}
-                {% if curr_stocks=={}%}
-                <tr>
-                    <td>
-                    No Stocks in Inventory Yet!
-                    </td>
-                </tr> 
-                {%endif%}   
-            </tbody>
-        </table>
-    </div>
-    <div class="stocks-table">
-        <h3 style="margin-top: 90px;">Stocks Recently Bought</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 135px;">Company Name</th>
-                    <th style="width: 115px;">Buying Price</th>
-                    <th style="width: 115px;">Quantity Bought</th>
-                    <th style="width: 115px;">Date and Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for q in stocks_bought%}
-                <tr>
-                    <td><a href="/allindexes/{{q[0]}}" style="text-decoration: none; color: rgb(5, 173, 117);">{{ all_stocks.index[all_stocks['Symbol'] == q[0]][0] }}</a></td>
-                    <td>Rs. {{q[1]}}</td>
-                    <td>{{q[2]}}</td>
-                    <td>{{q[3]}}</td>
-                </tr>
-                {%endfor%}
-                {% if stocks_bought==[]%}
-                <tr>
-                    <td>
-                    No Stocks bought Yet!
-                    </td>
-                </tr> 
-                {%endif%}   
-            </tbody>
-        </table>
-    </div>
-    <div class="stocks-table" style="margin-bottom: 100px;">
-        <h3 style="margin-top: 90px;">Stocks Recently Sold</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 135px;">Company Name</th>
-                    <th style="width: 115px;">Selling Price</th>
-                    <th style="width: 115px;">Quantity Sold</th>
-                    <th style="width: 115px;">Date and Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for q in stocks_sold%}
-                <tr>
-                    <td><a href="/allindexes/{{q[0]}}" style="text-decoration: none; color: rgb(5, 173, 117);">{{ all_stocks.index[all_stocks['Symbol'] == q[0]][0] }}</a></td>
-                    <td>Rs. {{q[1]}}</td>
-                    <td>{{q[2]}}</td>
-                    <td>{{q[3]}}</td>
-                </tr>
-                {%endfor%}
-                {% if stocks_sold==[]%}
-                <tr>
-                    <td>
-                    No Stocks sold Yet!
-                    </td>
-                </tr> 
-                {%endif%} 
-            </tbody>
-        </table>
-    </div>
-    <div id="money-section">
-        <h2>Your Balance</h2>
-        <p id="current-balance">Current Balance: Rs. {{bal}}</p>
-    
-        <div class="money-actions">
-            <div class="action-box">
-                <label for="add-money">Add Money:</label>
-                <input type="number" id="add-money" class="money-input" name="add-money" placeholder="Enter amount">
-                <button class="money-button" id="add-money-btn" onclick="addMoney()">Add</button>
-            </div>
-    
-            <div class="action-box">
-                <label for="extract-money">Extract Money:</label>
-                <input type="number" id="extract-money" class="money-input" name="extract-money" placeholder="Enter amount">
-                <button class="money-button" id="extract-money-btn" onclick="extractMoney()">Extract</button>
-            </div>
-        </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script> 
-    <script>
-        $('#drop1').load('/watchlist')
-        function toggleWatchlist(button) {
-            if (button.innerHTML === '+') {
-                var watch=$('#watch');
-                // console.log('hello: ',f)
-                // if (f==true){
-                //     watch.children().first().remove();
-                //     f=false;
-                // }
-                watch.find('a:contains("' + "Empty !" + '")').remove();
-                $.ajax({url:'/link_stock_graph',type:'POST',data:{'st':button.id},success:function(data){
-                    var link="/allindexes/"+data;
-                    watch.append('<a href='+link+ '>' +button.id+'</a>');
-                    console.log('hello','<a href='+link+ '>' +button.id +'</a>');
-                    var new_state=$('#watch').html();
-                    $.ajax({url: '/update_watch',type:'POST',data: {new_state:new_state,st:button.id}});
-                    button.innerHTML = '✔';
-                    button.style.backgroundColor='rgb(5,173,117)';
-                }});
-                
-                
+    </section>
 
-            } else {
-                var watch=$('#watch');
-                watch.find('a:contains("' + button.id + '")').remove();
-                
-                console.log("w",watch.length);
-                if(watch.children().length==0){
-                    watch.append('<a href="#">Empty !</a>');
-                }
-                var new_state=$('#watch').html();
-                console.log("hi",new_state);
-                $.ajax({url: '/update_watch',type:'POST',data: {new_state:new_state,st1:button.id}});
-                button.innerHTML = '+';
-                button.style.backgroundColor='black';
-            }
-        }
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const slideshow = document.getElementById('slideshow');
-            const overlay = document.getElementById('overlay-text-1');
-            const overlay1 = document.getElementById('overlay');
+</main>
 
-            
-            const lines = Array.from(overlay.getElementsByClassName('line'));
+<!-- ── Footer ────────────────────────────────────────────────────── -->
+<footer class="site-footer">
+    <span>Golden Harbor &copy; 2026 &nbsp;&bull;&nbsp; Virtual trading platform &bull;&nbsp; NSE data</span>
+</footer>
 
-            let currentIndex = 0;
-            let isHovered = false;
+<!-- ── Scripts ───────────────────────────────────────────────────── -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+$('#drop1').load('/watchlist');
 
-            function changeSlide() {
-                if (!isHovered) {
-                    currentIndex = (currentIndex + 1) % 3;
-                    updateLines();
-                    slideshow.style.transition = 'left 1s linear';
-                    slideshow.style.left = `-${currentIndex * 100}%`;
-                }
-            }
+// ── Slideshow ──────────────────────────────────────────────────────
+(function () {
+    var slides = document.querySelectorAll('#slideshow img');
+    var dots   = document.querySelectorAll('#heroDots .dot');
+    var cur = 0, timer;
+    function go(n) {
+        slides[cur].classList.remove('active');
+        dots[cur].classList.remove('active');
+        cur = (n + slides.length) % slides.length;
+        slides[cur].classList.add('active');
+        dots[cur].classList.add('active');
+    }
+    slides[0].classList.add('active');
+    timer = setInterval(function() { go(cur + 1); }, 4500);
+    dots.forEach(function(d, i) {
+        d.addEventListener('click', function() { clearInterval(timer); go(i); timer = setInterval(function(){ go(cur+1); }, 4500); });
+    });
+})();
 
-            function updateLines() {
-                lines.forEach((line, index) => {
-                    
-                    line.style.backgroundColor = '#fff';
-                    line.style.opacity = index === currentIndex ? '1' : '0.5';
-                });
-            }
+// ── Watchlist ──────────────────────────────────────────────────────
+function toggleWatchlist(button) {
+    var watch = $('#watch');
+    if (button.innerHTML === '+') {
+        watch.find('a:contains("Empty !")').remove();
+        $.ajax({ url:'/link_stock_graph', type:'POST', data:{'st': button.id}, success: function(data) {
+            var link = "/allindexes/" + data;
+            watch.append('<a href=' + link + '>' + button.id + '</a>');
+            $.ajax({ url:'/update_watch', type:'POST', data:{ new_state: watch.html(), st: button.id } });
+            button.innerHTML = '&#10004;';
+            button.classList.add('active-wl');
+        }});
+    } else {
+        watch.find('a:contains("' + button.id + '")').remove();
+        if (watch.children().length === 0) watch.append('<a href="#">Empty !</a>');
+        $.ajax({ url:'/update_watch', type:'POST', data:{ new_state: watch.html(), st1: button.id } });
+        button.innerHTML = '+';
+        button.classList.remove('active-wl');
+    }
+}
 
-            setInterval(changeSlide, 4000);
+// ── Search ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    var input = document.getElementById('search-input');
+    var sugg  = document.getElementById('searchSuggestions');
+    var btn   = document.getElementById('search-btn');
+    var all   = {{ all | safe }};
 
-          
-            overlay1.addEventListener('mouseenter', function () {
-                isHovered = true;
-            });
-
-            overlay1.addEventListener('mouseleave', function () {
-                isHovered = false;
-            });
-
-            slideshow.style.left = `-${currentIndex * 100}%`;
-            updateLines();
+    input.addEventListener('input', function () {
+        var q = input.value.toLowerCase();
+        var m = all.filter(s => s.toLowerCase().includes(q));
+        sugg.innerHTML = '';
+        m.forEach(function(s) {
+            var d = document.createElement('div');
+            d.textContent = s; d.className = 'search-suggestion';
+            d.addEventListener('click', function() { input.value = s; sugg.innerHTML = ''; sugg.style.display='none'; });
+            sugg.appendChild(d);
         });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.getElementById('search-input');
-            const searchSuggestions = document.getElementById('searchSuggestions');
+        sugg.style.display = m.length ? 'block' : 'none';
+    });
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#searchSuggestions') && !e.target.closest('#search-input')) sugg.style.display='none';
+    });
+    input.addEventListener('keydown', function(e) { if(e.key==='Enter'){e.preventDefault();btn.click();} });
+    btn.addEventListener('click', function() {
+        var st = input.value; input.value = ''; sugg.style.display = 'none';
+        $.ajax({ url:'/link_stock_graph', type:'POST', data:{'st':st}, success:function(d){ window.location.href='/allindexes/'+d; } });
+    });
+});
 
-            searchInput.addEventListener('input', function () {
-                const inputText = searchInput.value.toLowerCase();
-                const suggestions = {{all|safe}}.filter(item => item.toLowerCase().includes(inputText));
+// ── Balance ────────────────────────────────────────────────────────
+var currentBalance = {{ bal }};
+function fmtInr(v) { return '\u20B9\u00A0' + v.toLocaleString('en-IN',{minimumFractionDigits:2}); }
+function updateBalance() { document.getElementById('current-balance').textContent = fmtInr(currentBalance); }
 
-                searchSuggestions.innerHTML = '';
-                suggestions.forEach(suggestion => {
-                    const suggestionDiv = document.createElement('div');
-                    suggestionDiv.textContent = suggestion;
-                    suggestionDiv.classList.add('search-suggestion');
-                    suggestionDiv.addEventListener('click', function () {
-                        searchInput.value = suggestion;
-                        searchSuggestions.innerHTML = '';
-                    });
-                    searchSuggestions.appendChild(suggestionDiv);
-                });
-
-                searchSuggestions.style.display = suggestions.length ? 'block' : 'none';
-            });
-
-            document.addEventListener('click', function (event) {
-                if (!event.target.closest('#searchSuggestions') && !event.target.closest('#search-input')) {
-                    searchSuggestions.style.display = 'none';
-                }
-            });
-
-            const searchBtn = document.getElementById('search-btn');
-            // Pressing Enter in the input should behave the same as clicking the search button
-            searchInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    searchBtn.click();
-                }
-            });
-
-            searchBtn.addEventListener('click', function () {
-                var st=searchInput.value;
-                searchInput.value = '';
-
-                searchSuggestions.style.display = 'none';
-
-                const searchText = searchInput.value;
-                console.log(`Search button clicked with text: ${searchText}`);
-                $.ajax({url:'/link_stock_graph',type:'POST',data:{'st':st},success:function(data){window.location.href="/allindexes/"+data;}});
-            });
-        });
-    </script>
-    <script>
-    let currentBalance = {{bal}}; 
-
-        function addMoney() {
-            const addAmount = parseFloat(document.getElementById('add-money').value);
-            if (!isNaN(addAmount)) {
-                currentBalance += addAmount;
-                $.ajax({url:'/update_balance',type:'POST', data:{balance:currentBalance}});
-                updateBalance();
-                clearInput('add-money');
-            }
-        }
-
-        function extractMoney() {
-            const extractAmount = parseFloat(document.getElementById('extract-money').value);
-            if (!isNaN(extractAmount)) {
-                currentBalance -= extractAmount;
-                $.ajax({url:'/update_balance',type:'POST', data:{balance:currentBalance}});
-                updateBalance();
-                clearInput('extract-money');
-            }
-        }
-
-        function updateBalance() {
-            // Display balance in Indian Rupees (Rs.)
-            document.getElementById('current-balance').textContent = `Current Balance: Rs. ${currentBalance.toFixed(2)}`;
-        }
-
-        function clearInput(inputId) {
-            document.getElementById(inputId).value = '';
-        }
-    </script>
+function addMoney() {
+    var a = parseFloat(document.getElementById('add-money').value);
+    if (!isNaN(a) && a > 0) {
+        currentBalance += a;
+        $.ajax({ url:'/update_balance', type:'POST', data:{ balance: currentBalance } });
+        updateBalance();
+        document.getElementById('add-money').value = '';
+    }
+}
+function extractMoney() {
+    var a = parseFloat(document.getElementById('extract-money').value);
+    if (!isNaN(a) && a > 0 && a <= currentBalance) {
+        currentBalance -= a;
+        $.ajax({ url:'/update_balance', type:'POST', data:{ balance: currentBalance } });
+        updateBalance();
+        document.getElementById('extract-money').value = '';
+    }
+}
+function resetBalance() {
+    if (!confirm('Reset balance to \u20B91,00,000?\nThis will also clear all stocks and history.')) return;
+    $.ajax({ url:'/reset_balance', type:'POST', success: function() { window.location.reload(); } });
+}
+</script>
 </body>
 </html>

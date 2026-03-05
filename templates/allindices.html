@@ -1,112 +1,104 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Webpage Title</title>
+    <title>All Indices &ndash; Golden Harbor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='ind.css') }}">
 </head>
 <body>
-    <header>
-        <div id="company-info">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" id="logo">
-            <span id="company-name"><a href="/main" style="text-decoration: none; color:azure">Golden Harbor</a></span>
-        </div>
-        <div id="search-box" class="search-container">
-            <button id="search-btn"><img src="{{ url_for('static', filename='glass.png') }}" alt="Search" style="width: 40px;"></button>
-            <input type="text" id="search-input" placeholder="What do you want to analyze">
-            <div class="search-suggestions" id="searchSuggestions"></div>
-        </div>
-        <div id="user-info">
-            <div class="header-content">
-                <div class="dropdown">
-                    <button class="dropbtn">{{user}}'s Watchlist</button>
-                    <div class="dropdown-content" id="drop">
-                        
-                    </div>
-                </div>
-            </div>
-            <span id="user-icon" style="margin-right: 60px;">
-                <a href="/logout">
-                    <img src="{{ url_for('static', filename='icon.png') }}" alt="Company Logo" id="logo" title="Logout" style="display: block;">
-                    <p style="text-align: center; color: azure; font-size: 10px; margin-top: -5px; margin-left: -10px;">Logout</p>
-                </a>
-            </span>
-        </div>
-    </header>
-    <div id="breadcrumb" style="margin-top: 100px;">
-        <a href="/main">Home</a> -> All Indices
+
+<!-- ── Navbar ────────────────────────────────────────────────────── -->
+<header class="navbar">
+    <div class="nav-brand">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        <a href="/main" class="nav-brand-name">Golden Harbor</a>
     </div>
-    <div style="display: flex;justify-content: space-between; margin-right: 200px;">
-        <h1>All Indices</h1>
-        <div class="filter-container">
-            <h2 class="filter-btn">Filter</h2>
-            <div class="filter-dropdown">
-                <a href="#">
-                    Previous Closing Price
-                    <div class="avg-price-filter">
-                        
-                        <input type="number" id="lowerPrice" placeholder="Enter lower price">
-    
-                        <span class="to-text">to</span>
-    
-                        
-                        <input type="number" id="higherPrice" placeholder="Enter higher price">
-                        <br>
-                        <button onclick="refreshContent()">Apply</button>
-                    </div>
-                </a>
-                <a href="#">
-                    Live price
-                    <div class="avg-price-filter">
-                        
-                        <input type="number" id="lowerPr"  placeholder="Enter lower price">
-    
-                        <span class="to-text">to</span>
-    
-                        
-                        <input type="number" id="higherPr" step="any" placeholder="Enter higher price">
-                        <br>
-                        <button onclick="refreshLive()">Apply</button>
-                    </div>
-                </a>
-                <a href="#">Performance
-                    <div class="avg-price-filter">
-                        
-                        <button onclick="performance()">Apply</button>
-                    </div>
-                </a>
-                <a href="#">
-                    Opening price
-                    <div class="avg-price-filter">
-                        
-                        <input type="number" id="lowerP"  placeholder="Enter lower price">
-    
-                        <span class="to-text">to</span>
-    
-                        
-                        <input type="number" id="higherP" step="any" placeholder="Enter higher price">
-                        <br>
-                        <button onclick="refreshOpen()">Apply</button>
-                    </div>
-                </a>
-                <a href="#">
-                    Refresh
-                    <div class="avg-price-filter">
-                        
-                        <button onclick="refresh()">Apply</button>
-                    </div>
-                </a>
-            </div>
-        </div>
+    <div class="nav-search search-container">
+        <button id="search-btn" class="search-icon-btn">
+            <img src="{{ url_for('static', filename='glass.png') }}" alt="Search">
+        </button>
+        <input type="text" id="search-input" placeholder="Search stocks&hellip;">
+        <div class="search-suggestions" id="searchSuggestions"></div>
     </div>
-    <div class="stocks-table">
+    <div class="nav-right">
+        <div class="dropdown">
+            <button class="dropbtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                {{user}}&rsquo;s Watchlist
+            </button>
+            <div class="dropdown-content" id="drop"></div>
+        </div>
+        <a href="/logout" class="logout-btn">
+            <img src="{{ url_for('static', filename='icon.png') }}" alt="Logout">
+            <span>Logout</span>
+        </a>
+    </div>
+</header>
+
+<!-- ── Page body ─────────────────────────────────────────────────── -->
+<div class="page-wrap">
+
+    <!-- Breadcrumb + title row -->
+    <div class="page-top">
+        <div class="breadcrumb">
+            <a href="/main">Home</a>
+            <span class="bc-sep">&rsaquo;</span>
+            <span>All Indices</span>
+        </div>
+        <h1 class="page-title">NIFTY 50 &mdash; All Stocks</h1>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+        <span class="filter-label">Filter by</span>
+
+        <div class="filter-group">
+            <span class="fg-label">Prev. Close</span>
+            <input type="number" id="lowerPrice" class="fi" placeholder="Min">
+            <span class="fi-sep">–</span>
+            <input type="number" id="higherPrice" class="fi" placeholder="Max">
+            <button class="fb" onclick="refreshContent()">Apply</button>
+        </div>
+
+        <div class="filter-group">
+            <span class="fg-label">Live Price</span>
+            <input type="number" id="lowerPr" class="fi" placeholder="Min">
+            <span class="fi-sep">–</span>
+            <input type="number" id="higherPr" step="any" class="fi" placeholder="Max">
+            <button class="fb" onclick="refreshLive()">Apply</button>
+        </div>
+
+        <div class="filter-group">
+            <span class="fg-label">Open</span>
+            <input type="number" id="lowerP" class="fi" placeholder="Min">
+            <span class="fi-sep">–</span>
+            <input type="number" id="higherP" step="any" class="fi" placeholder="Max">
+            <button class="fb" onclick="refreshOpen()">Apply</button>
+        </div>
+
+        <button class="fb perf-btn" onclick="performance()">Performance Sort</button>
+        <button class="fb reset-btn" onclick="refresh()">&#8635; Reset</button>
+    </div>
+
+    <!-- Live indicator -->
+    <div class="live-bar">
+        <span class="live-dot"></span>
+        <span id="liveStatus">Prices update every 15 s</span>
+        <span id="lastUpdated"></span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
         <table>
             <thead>
                 <tr>
                     <th>Company Name</th>
                     <th>Symbol</th>
-                    <th >Live Price</th>
+                    <th>Live Price</th>
+                    <th>Change</th>
                     <th>High</th>
                     <th>Low</th>
                     <th>Open</th>
@@ -115,267 +107,195 @@
                 </tr>
             </thead>
             <tbody id="tab">
-                
-                
-                {% for stock in all%}
-              <tr>
-    
-                    <td>{{stock}}</td>
-                    <td><a href="/allindexes/{{all_stocks.loc[stock]['Symbol']}}" style="text-decoration: none; color: rgb(5, 173, 117);">{{all_stocks.loc[stock]['Symbol']}}</a></td>
-                    <td>{{f(all_stocks.loc[stock]['Symbol'])['lastPrice']}}</td>
-                    <td>{{f(all_stocks.loc[stock]['Symbol'])['intraDayHighLow']['max']}}</td>
-                    <td>{{f(all_stocks.loc[stock]['Symbol'])['intraDayHighLow']['min']}}</td>
-                    <td>{{f(all_stocks.loc[stock]['Symbol'])['open']}}</td>
-                    <td>{{f(all_stocks.loc[stock]['Symbol'])['previousClose']}}</td>
-                    
-                    {%if stock in curr%}
-                    <td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)" style="background-color: rgb(5, 173, 117);">✔</button></td>
-                    {%else%}
+                {% for stock in all %}
+                {% set sym = all_stocks.loc[stock]['Symbol'] %}
+                {% set d = f(sym) %}
+                {% set chg = d['change'] | float %}
+                <tr data-symbol="{{sym}}">
+                    <td class="company-cell">{{stock}}</td>
+                    <td><a href="/allindexes/{{sym}}" class="sym-link">{{sym}}</a></td>
+                    <td class="num lp">{{d['lastPrice']}}</td>
+                    <td class="num chg {% if chg >= 0 %}pos{% else %}neg{% endif %}">{% if chg >= 0 %}&#9650;{% else %}&#9660;{% endif %} {{d['change']}} ({{d['pChange']}}%)</td>
+                    <td class="num pos hi">{{d['intraDayHighLow']['max']}}</td>
+                    <td class="num neg lo">{{d['intraDayHighLow']['min']}}</td>
+                    <td class="num op">{{d['open']}}</td>
+                    <td class="num pc">{{d['previousClose']}}</td>
+                    {% if stock in curr %}
+                    <td><button class="round-button active-wl" id="{{stock}}" onclick="toggleWatchlist(this)">&#10004;</button></td>
+                    {% else %}
                     <td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)">+</button></td>
-                    {%endif%}
-                    
+                    {% endif %}
                 </tr>
-                {%endfor%}
+                {% endfor %}
             </tbody>
         </table>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script>
-        var f=true;
-        $('#drop').load('/watchlist')
-        function toggleWatchlist(button) {
-            
-            if (button.innerHTML === '+') {
-                var watch=$('#watch');
-                console.log('hello: ',f)
-                // if (f==true){
-                //     watch.children().first().remove();
-                //     f=false;
-                // }
-                watch.find('a:contains("' + "Empty !" + '")').remove();
-                $.ajax({url:'/link_stock_graph',type:'POST',data:{'st':button.id},success:function(data){
-                    var link="/allindexes/"+data;
-                    watch.append('<a href='+link+ '>' +button.id +'</a>');
-                    console.log('hello','<a href='+link+ '>' +button.id +'</a>');
-                    var new_state=$('#watch').html();
-                    $.ajax({url: '/update_watch',type:'POST',data: {new_state:new_state,st:button.id}});
-                    button.innerHTML = '✔';
-                    button.style.backgroundColor='rgb(5,173,117)';
-                }});
-                
-                
 
-            } else {
-                var watch=$('#watch');
-                watch.find('a:contains("' + button.id + '")').remove();
-                
-                console.log("w",watch.length);
-                if(watch.children().length==0){
-                    watch.append('<a href="#">Empty !</a>');
-                }
-                var new_state=$('#watch').html();
-                console.log("hi",new_state);
-                $.ajax({url: '/update_watch',type:'POST',data: {new_state:new_state,st1:button.id}});
-                button.innerHTML = '+';
-                button.style.backgroundColor='black';
-            }
+</div>
+
+<!-- ── Footer ────────────────────────────────────────────────────── -->
+<footer class="site-footer">
+    <span>Golden Harbor &copy; 2026 &nbsp;&bull;&nbsp; Virtual trading platform &bull;&nbsp; NSE data</span>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $('#drop').load('/watchlist');
+
+    function toggleWatchlist(button) {
+        if (button.innerHTML === '+') {
+            var watch = $('#watch');
+            watch.find('a:contains("Empty !")').remove();
+            $.ajax({ url: '/link_stock_graph', type: 'POST', data: { 'st': button.id }, success: function (data) {
+                var link = "/allindexes/" + data;
+                watch.append('<a href=' + link + '>' + button.id + '</a>');
+                var new_state = $('#watch').html();
+                $.ajax({ url: '/update_watch', type: 'POST', data: { new_state: new_state, st: button.id } });
+                button.innerHTML = '&#10004;';
+                button.classList.add('active-wl');
+            }});
+        } else {
+            var watch = $('#watch');
+            watch.find('a:contains("' + button.id + '")').remove();
+            if (watch.children().length == 0) watch.append('<a href="#">Empty !</a>');
+            var new_state = $('#watch').html();
+            $.ajax({ url: '/update_watch', type: 'POST', data: { new_state: new_state, st1: button.id } });
+            button.innerHTML = '+';
+            button.classList.remove('active-wl');
         }
-        function refreshContent() {
-            var loop=$('#tab');
-            loop.empty();
-            var lp = document.getElementById("lowerPrice").value;
-            console.log('Input Value:', lp)
-            var hp = document.getElementById("higherPrice").value;
-            
-            {% for stock in all%}
-            var f=parseFloat('{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}');
-            if (f>=lp && f<=hp){
-            var newRow = '<tr>' +
-                    '<td>{{ stock }}</td>' +
-                    '<td><a href="/allindexes/{{all_stocks.loc[stock]["Symbol"]}}" style="text-decoration: none; color: rgb(5, 173, 117);">{{all_stocks.loc[stock]["Symbol"]}}</a></td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["max"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["min"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}</td>' +
-                    {%if stock in curr%}
-                    '<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)" style="background-color: rgb(5, 173, 117);">✔</button></td>'+
-                    {%else%}
-                    '<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)">+</button></td>'+
-                    {%endif%}
-                    +
-                    '</tr>';
+    }
 
-                $('#tab').append(newRow);
-            }
-            {%endfor%}
-            
-            
-                
-                
+    function fmt(v) { var n = parseFloat(v); return isNaN(n) ? (v || 'N/A') : n.toFixed(2); }
+
+    function rowHtml(stock, sym, lp, chg, pchg, high, low, open, prev, watchBtn) {
+        var arrow = parseFloat(chg) >= 0 ? '&#9650;' : '&#9660;';
+        var chgCls = parseFloat(chg) >= 0 ? 'pos' : 'neg';
+        return '<tr data-symbol="' + sym + '">' +
+            '<td class="company-cell">' + stock + '</td>' +
+            '<td><a href="/allindexes/' + sym + '" class="sym-link">' + sym + '</a></td>' +
+            '<td class="num lp">' + fmt(lp) + '</td>' +
+            '<td class="num chg ' + chgCls + '">' + arrow + ' ' + fmt(chg) + ' (' + fmt(pchg) + '%)</td>' +
+            '<td class="num pos hi">' + fmt(high) + '</td>' +
+            '<td class="num neg lo">' + fmt(low) + '</td>' +
+            '<td class="num op">' + fmt(open) + '</td>' +
+            '<td class="num pc">' + fmt(prev) + '</td>' +
+            watchBtn + '</tr>';
+    }
+
+    // ── Live price polling ─────────────────────────────────────────
+    var allSymbols = [];
+    document.querySelectorAll('#tab tr[data-symbol]').forEach(function(r) {
+        allSymbols.push(r.getAttribute('data-symbol'));
+    });
+
+    function pollPrices() {
+        if (!allSymbols.length) return;
+        $.getJSON('/api/live_prices', { symbols: allSymbols.join(',') }, function(data) {
+            document.querySelectorAll('#tab tr[data-symbol]').forEach(function(row) {
+                var sym = row.getAttribute('data-symbol');
+                if (!data[sym]) return;
+                var d = data[sym];
+                var chg = parseFloat(d.change);
+                var arrow = chg >= 0 ? '&#9650;' : '&#9660;';
+                var cls   = chg >= 0 ? 'pos' : 'neg';
+                row.querySelector('.lp').textContent = fmt(d.lastPrice);
+                row.querySelector('.chg').className = 'num chg ' + cls;
+                row.querySelector('.chg').innerHTML  = arrow + ' ' + fmt(d.change) + ' (' + fmt(d.pChange) + '%)';
+                row.querySelector('.hi').textContent = fmt(d.high);
+                row.querySelector('.lo').textContent = fmt(d.low);
+                row.querySelector('.op').textContent = fmt(d.open);
+                row.querySelector('.pc').textContent = fmt(d.prevClose);
+            });
+            var now = new Date();
+            document.getElementById('lastUpdated').textContent =
+                '\u00b7 Updated ' + now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        });
+    }
+    setInterval(pollPrices, 15000);
+
+    function refreshContent() {
+        var loop = $('#tab'); loop.empty();
+        var lp = parseFloat(document.getElementById("lowerPrice").value);
+        var hp = parseFloat(document.getElementById("higherPrice").value);
+        {% for stock in all %}
+        var f = parseFloat('{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}');
+        if (f >= lp && f <= hp) {
+            $('#tab').append(rowHtml('{{ stock }}','{{all_stocks.loc[stock]["Symbol"]}}','{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["change"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["pChange"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["max"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["min"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}',
+            {%if stock in curr%}'<td><button class="round-button active-wl" id="{{stock}}" onclick="toggleWatchlist(this)">&#10004;</button></td>'{%else%}'<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)">+</button></td>'{%endif%}));
+        }
+        {% endfor %}
+        pollPrices();
     }
 
     function refreshLive() {
-            var loop=$('#tab');
-            loop.empty();
-            var lp = document.getElementById("lowerPr").value;
-            console.log('Input Value:', lp)
-            var hp = document.getElementById("higherPr").value;
-            
-            {% for stock in all%}
-            var f=parseFloat('{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}');
-            if (f>=lp && f<=hp){
-            var newRow = '<tr>' +
-                    '<td>{{ stock }}</td>' +
-                    '<td><a href="/allindexes/{{all_stocks.loc[stock]["Symbol"]}}" style="text-decoration: none; color: rgb(5, 173, 117);">{{all_stocks.loc[stock]["Symbol"]}}</a></td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["max"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["min"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}</td>' +
-                    {%if stock in curr%}
-                    '<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)" style="background-color: rgb(5, 173, 117);">✔</button></td>'+
-                    {%else%}
-                    '<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)">+</button></td>'+
-                    {%endif%}
-                    +
-                    '</tr>';
-
-                $('#tab').append(newRow);
-            }
-            {%endfor%}
-            
-            
-               
-                
+        var loop = $('#tab'); loop.empty();
+        var lp = parseFloat(document.getElementById("lowerPr").value);
+        var hp = parseFloat(document.getElementById("higherPr").value);
+        {% for stock in all %}
+        var f = parseFloat('{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}');
+        if (f >= lp && f <= hp) {
+            $('#tab').append(rowHtml('{{ stock }}','{{all_stocks.loc[stock]["Symbol"]}}','{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["change"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["pChange"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["max"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["min"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}',
+            {%if stock in curr%}'<td><button class="round-button active-wl" id="{{stock}}" onclick="toggleWatchlist(this)">&#10004;</button></td>'{%else%}'<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)">+</button></td>'{%endif%}));
+        }
+        {% endfor %}
+        pollPrices();
     }
+
     function refreshOpen() {
-            var loop=$('#tab');
-            loop.empty();
-            var lp = document.getElementById("lowerP").value;
-            console.log('Input Value:', lp)
-            var hp = document.getElementById("higherP").value;
-            
-            {% for stock in all%}
-            var f=parseFloat('{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}');
-            if (f>=lp && f<=hp){
-            var newRow = '<tr>' +
-                    '<td>{{ stock }}</td>' +
-                    '<td><a href="/allindexes/{{all_stocks.loc[stock]["Symbol"]}}" style="text-decoration: none; color: rgb(5, 173, 117);">{{all_stocks.loc[stock]["Symbol"]}}</a></td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["max"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["min"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}</td>' +
-                    {%if stock in curr%}
-                    '<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)" style="background-color: rgb(5, 173, 117);">✔</button></td>'+
-                    {%else%}
-                    '<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)">+</button></td>'+
-                    {%endif%}
-                    +
-                    '</tr>';
-
-                $('#tab').append(newRow);
-            }
-            {%endfor%}
-            
-            
-               
-                
+        var loop = $('#tab'); loop.empty();
+        var lp = parseFloat(document.getElementById("lowerP").value);
+        var hp = parseFloat(document.getElementById("higherP").value);
+        {% for stock in all %}
+        var f = parseFloat('{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}');
+        if (f >= lp && f <= hp) {
+            $('#tab').append(rowHtml('{{ stock }}','{{all_stocks.loc[stock]["Symbol"]}}','{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["change"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["pChange"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["max"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["min"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}',
+            {%if stock in curr%}'<td><button class="round-button active-wl" id="{{stock}}" onclick="toggleWatchlist(this)">&#10004;</button></td>'{%else%}'<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)">+</button></td>'{%endif%}));
+        }
+        {% endfor %}
+        pollPrices();
     }
+
     function refresh() {
-            
-            var loop=$('#tab');
-            loop.empty();
-
-            
-            {% for stock in all%}
-            //var f=parseFloat('{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}');
-            
-            var newRow = '<tr>' +
-                    '<td>{{ stock }}</td>' +
-                    '<td><a href="/allindexes/{{all_stocks.loc[stock]["Symbol"]}}" style="text-decoration: none; color: rgb(5, 173, 117);">{{all_stocks.loc[stock]["Symbol"]}}</a></td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["max"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["min"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}</td>' +
-                    '<td>{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}</td>' +
-                    {%if stock in curr%}
-                    '<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)" style="background-color: rgb(5, 173, 117);">✔</button></td>'+
-                    {%else%}
-                    '<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)">+</button></td>'+
-                    {%endif%}
-                     +
-                    '</tr>';
-
-                $('#tab').append(newRow);
-            
-            {%endfor%}
-         
+        var loop = $('#tab'); loop.empty();
+        {% for stock in all %}
+        $('#tab').append(rowHtml('{{ stock }}','{{all_stocks.loc[stock]["Symbol"]}}','{{ f(all_stocks.loc[stock]["Symbol"])["lastPrice"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["change"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["pChange"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["max"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["intraDayHighLow"]["min"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["open"] }}','{{ f(all_stocks.loc[stock]["Symbol"])["previousClose"] }}',
+        {%if stock in curr%}'<td><button class="round-button active-wl" id="{{stock}}" onclick="toggleWatchlist(this)">&#10004;</button></td>'{%else%}'<td><button class="round-button" id="{{stock}}" onclick="toggleWatchlist(this)">+</button></td>'{%endif%}));
+        {% endfor %}
+        pollPrices();
     }
 
-    function performance(){
-        $.ajax({url:'/update_performance',type:'POST',success:function(data){
-            console.log('hi')
-            location.reload();
-        
-            
-         }});
+    function performance() {
+        $.ajax({ url: '/update_performance', type: 'POST', success: function () { location.reload(); } });
     }
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.getElementById('search-input');
-            const searchSuggestions = document.getElementById('searchSuggestions');
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-input');
+        const searchSugg  = document.getElementById('searchSuggestions');
+        const searchBtn   = document.getElementById('search-btn');
 
-            searchInput.addEventListener('input', function () {
-                const inputText = searchInput.value.toLowerCase();
-                
-                const suggestions = {{all|safe}}.filter(item => item.toLowerCase().includes(inputText));
-
-                searchSuggestions.innerHTML = '';
-                suggestions.forEach(suggestion => {
-                    const suggestionDiv = document.createElement('div');
-                    suggestionDiv.textContent = suggestion;
-                    suggestionDiv.classList.add('search-suggestion');
-                    suggestionDiv.addEventListener('click', function () {
-                        searchInput.value = suggestion;
-                        searchSuggestions.innerHTML = '';
-                    });
-                    searchSuggestions.appendChild(suggestionDiv);
-                });
-
-                searchSuggestions.style.display = suggestions.length ? 'block' : 'none';
+        searchInput.addEventListener('input', function () {
+            const q = searchInput.value.toLowerCase();
+            const m = {{all|safe}}.filter(s => s.toLowerCase().includes(q));
+            searchSugg.innerHTML = '';
+            m.forEach(s => {
+                const d = document.createElement('div');
+                d.textContent = s; d.className = 'search-suggestion';
+                d.addEventListener('click', function () { searchInput.value = s; searchSugg.innerHTML = ''; searchSugg.style.display = 'none'; });
+                searchSugg.appendChild(d);
             });
-
-            document.addEventListener('click', function (event) {
-                if (!event.target.closest('#searchSuggestions') && !event.target.closest('#search-input')) {
-                    searchSuggestions.style.display = 'none';
-                }
-            });
-
-            const searchBtn = document.getElementById('search-btn');
-            // Pressing Enter in the input should behave the same as clicking the search button
-            searchInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    searchBtn.click();
-                }
-            });
-
-            searchBtn.addEventListener('click', function () {
-                var st=searchInput.value;
-                searchInput.value = '';
-
-                
-                searchSuggestions.style.display = 'none';
-
-                
-                const searchText = searchInput.value;
-                console.log(`Search button clicked with text: ${searchText}`);
-                $.ajax({url:'/link_stock_graph',type:'POST',data:{'st':st},success:function(data){window.location.href="/allindexes/"+data;}});
-            });
+            searchSugg.style.display = m.length ? 'block' : 'none';
         });
-    </script>
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('#searchSuggestions') && !e.target.closest('#search-input'))
+                searchSugg.style.display = 'none';
+        });
+        searchInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); searchBtn.click(); } });
+        searchBtn.addEventListener('click', function () {
+            var st = searchInput.value; searchInput.value = ''; searchSugg.style.display = 'none';
+            $.ajax({ url: '/link_stock_graph', type: 'POST', data: { 'st': st }, success: function (d) { window.location.href = '/allindexes/' + d; } });
+        });
+    });
+</script>
 </body>
 </html>

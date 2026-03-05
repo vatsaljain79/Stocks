@@ -1,517 +1,392 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Webpage Title</title>
+    <title>{{ all_stocks.index[all_stocks['Symbol'] == symbol][0] }} &ndash; Golden Harbor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='eachstock.css') }}">
 </head>
 <body>
-    <header>
-        <div id="company-info">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" id="logo">
-            <span id="company-name"><a href="/main" style="text-decoration: none; color:azure">Golden Harbor</a></span>
+
+<!-- ── Navbar ────────────────────────────────────────────────────── -->
+<header class="navbar">
+    <div class="nav-brand">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        <a href="/main" class="nav-brand-name">Golden Harbor</a>
+    </div>
+    <div class="nav-search search-container">
+        <button id="search-btn" class="search-icon-btn">
+            <img src="{{ url_for('static', filename='glass.png') }}" alt="Search">
+        </button>
+        <input type="text" id="search-input" placeholder="Search stocks&hellip;">
+        <div class="search-suggestions" id="searchSuggestions"></div>
+    </div>
+    <div class="nav-right">
+        <div class="dropdown">
+            <button class="dropbtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                {{user}}&rsquo;s Watchlist
+            </button>
+            <div class="dropdown-content" id="drop"></div>
         </div>
-        <div id="search-box" class="search-container">
-            <button id="search-btn"><img src="{{ url_for('static', filename='glass.png') }}" alt="Search" style="width: 40px;"></button>
-            <input type="text" id="search-input" placeholder="What do you want to analyze">
-            <div class="search-suggestions" id="searchSuggestions"></div>
+        <a href="/logout" class="logout-btn">
+            <img src="{{ url_for('static', filename='icon.png') }}" alt="Logout">
+            <span>Logout</span>
+        </a>
+    </div>
+</header>
+
+<!-- ── Page body ─────────────────────────────────────────────────── -->
+<div class="page-content">
+
+    <div class="breadcrumb">
+        <a href="/main">Home</a>
+        <span class="bc-sep">&rsaquo;</span>
+        <a href="/allindexes">All Indices</a>
+        <span class="bc-sep">&rsaquo;</span>
+        <span>{{ all_stocks.index[all_stocks['Symbol'] == symbol][0] }}</span>
+    </div>
+
+    <!-- Hero price strip -->
+    <div class="stock-hero">
+        <div class="stock-hero-left">
+            <div class="stock-sym-chip">{{symbol}}</div>
+            <h1 class="stock-fullname">{{ all_stocks.index[all_stocks['Symbol'] == symbol][0] }}</h1>
+            <div class="stock-price-row">
+                <span id="live-price-display" class="lp-value">&nbsp;&#8377;&nbsp;{{ live['lastPrice'] }}</span>
+                {% if int(live['change'], 2) >= 0 %}
+                <span id="live-change-display" class="lp-change pos">&#9650; {{ int(live['change'], 2) }} &nbsp;({{ int(live['pChange'], 2) }}%)</span>
+                {% else %}
+                <span id="live-change-display" class="lp-change neg">&#9660; {{ int(live['change'], 2) }} &nbsp;({{ int(live['pChange'], 2) }}%)</span>
+                {% endif %}
+            </div>
         </div>
-        <div id="user-info">
-            <div class="header-content">
-                <div class="dropdown">
-                    <button class="dropbtn">{{user}}'s Watchlist</button>
-                    <div class="dropdown-content" id="drop">
-                        <!-- Add your dropdown menu items here -->
-                       
+        <div class="stock-hero-right">
+            <button class="watchlist-btn {% if iswatch %}wl-active{% endif %}" id="watchlistButton">
+                <img class="watchlist-logo" src="{{ url_for('static', filename='watchlist.png') }}" alt="">
+                <span id="watchlistText">{% if iswatch %}&#10004; Watchlisted{% else %}+ Watchlist{% endif %}</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Two-column grid -->
+    <div class="content-grid">
+
+        <!-- ── Left column ─────────────────────────────── -->
+        <div class="col-left">
+
+            <!-- Performance card -->
+            <div class="card perf-card">
+                <h2 class="card-title">
+                    <span class="card-title-icon">&#128200;</span> Market Data
+                </h2>
+                <div class="perf-grid">
+                    <div class="perf-item">
+                        <span class="perf-label">Today&rsquo;s High</span>
+                        <span class="perf-value">{{ live['intraDayHighLow']['max'] }}</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">Today&rsquo;s Low</span>
+                        <span class="perf-value">{{ live['intraDayHighLow']['min'] }}</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">Open</span>
+                        <span class="perf-value">{{ live['open'] }}</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">Prev. Close</span>
+                        <span class="perf-value">{{ live['previousClose'] }}</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">52-Week High</span>
+                        <span class="perf-value highlight-green">{{ w52_high }}</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">52-Week Low</span>
+                        <span class="perf-value highlight-red">{{ w52_low }}</span>
                     </div>
                 </div>
             </div>
-            <span id="user-icon" style="margin-right: 60px;">
-                <a href="/logout">
-                    <img src="{{ url_for('static', filename='icon.png') }}" alt="Company Logo" id="logo" title="Logout" style="display: block;">
-                    <p style="text-align: center; color: azure; font-size: 10px; margin-top: -5px; margin-left: -10px;">Logout</p>
-                </a>
-            </span>
-        </div>
-    </header>
-    <div id="breadcrumb" style="margin-top: 100px;">
-        <a href="/main">Home</a> -> <a href="/allindexes">All Indices</a> -> {{ all_stocks.index[all_stocks['Symbol'] == symbol][0]}}
-    </div>
-    <div class="headertemp">
-        <h1>{{ all_stocks.index[all_stocks['Symbol'] == symbol][0]}}</h1>
-        <button class="watchlist-button" id="watchlistButton">
-            <img class="watchlist-logo" src="{{ url_for('static', filename='watchlist.png') }}" alt="Watchlist Logo">
-            {%if iswatch==True%}
-            <span id="watchlistText">✔ Watchlisted</span>
-            {%else%}
-            <span id="watchlistText">Watchlist</span>
-            {%endif%}
-        </button>
-    </div>
-        {% if (int(f(symbol)['change'],2)>0) %}
-    <h1 style="margin-left: 125px; margin-top: -10px;"><span>{{f(symbol)['lastPrice']}}</span> <span style="font-size: 20px; color: rgb(5,173,117);">{{int(f(symbol)['change'],2)}} ({{int(f(symbol)['pChange'],2)}})</span> </h1>
-    {%else%}
-    <h1 style="margin-left: 125px; margin-top: -10px;"><span>{{f(symbol)['lastPrice']}}</span> <span style="font-size: 20px; color: red;">{{int(f(symbol)['change'],2)}} ({{int(f(symbol)['pChange'],2)}})</span> </h1>
-    {%endif%}
-    <div class="left-side">
-        <!-- <img src="back3.jpg" alt="Your Image" style="margin-left: 100px; margin-right: 50px; width: 850px; height: 450px;"> -->
-        <div style="margin-left: 50px;"><!-- <img src="{{ url_for('static', filename='back3.jpg') }}" alt="Your Image" style="margin-left: 100px; margin-right: 50px; width: 850px; height: 450px;"> -->
-            <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-3.3.3.min.js"></script>
-            {{ script | safe }}
-            {{ div | safe }}
-            </div>
-        <div class="buttons-container">
-            <div class="time-buttons">
-                {% if gt=='1D'%}
-                <button class="active" onclick="changeTimeButton(this, '1D')">1D</button>
-                {%else%}
-                <button  onclick="changeTimeButton(this, '1D')">1D</button>
-                {%endif%}
-                {% if gt=='1W'%}
-                <button class="active" onclick="changeTimeButton(this, '1W')">1W</button>
-                {%else%}
-                <button  onclick="changeTimeButton(this, '1W')">1W</button>
-                {%endif%}
-                {% if gt=='1M'%}
-                <button class="active" onclick="changeTimeButton(this, '1M')">1M</button>
-                {%else%}
-                <button  onclick="changeTimeButton(this, '1M')">1M</button>
-                {%endif%}
-                {% if gt=='1Y'%}
-                <button class="active" onclick="changeTimeButton(this, '1Y')">1Y</button>
-                {%else%}
-                <button  onclick="changeTimeButton(this, '1Y')">1Y</button>
-                {%endif%}
-                {% if gt=='5Y'%}
-                <button class="active" onclick="changeTimeButton(this, '5Y')">5Y</button>
-                {%else%}
-                <button  onclick="changeTimeButton(this, '5Y')">5Y</button>
-                {%endif%}
-                <!-- <button onclick="changeTimeButton(this, '1M')">1M</button>
-                <button onclick="changeTimeButton(this, '1W')">1W</button>
-                <button onclick="changeTimeButton(this, '1Y')">1Y</button>
-                <button onclick="changeTimeButton(this, '5Y')">5Y</button> -->
-            </div>
-            <!-- resolution selector removed to restore previous behavior -->
-            <button class="toggle-button" onclick="toggleImage()">
-                {%if is_candle==False%}
-                
-                <img id="toggleImage" src = "{{ url_for('static', filename='candle.png') }}"; alt="Toggle Image">
-                {%else%}
-                <img id="toggleImage" src = "{{ url_for('static', filename='line.png') }}"; alt="Toggle Image">
-                {%endif%}
-            </button>
-        </div>
-        <div class="performance-section">
-            <h2>Performance</h2>
-            <ul class="performance-details">
-                <li class="special" style="margin-right: 350px;"><strong>Today's High:</strong> {{f(symbol)['intraDayHighLow']['max']}}</li>
-                <li class="special"><strong>Today's Low:</strong> {{f(symbol)['intraDayHighLow']['min']}}</li>
-                <li><strong>Open:</strong> {{f(symbol)['open']}}</li>
-                <li class="spec" style="margin-right: 340px;"><strong>52-Week High:</strong>{{w52['52W H'][0]}} </li>
-                <li class="spec"><strong>52-Week Low:</strong> 9{{w52['52W L'][0]}}</li>
-                <li><strong>Prev. Close:</strong> {{f(symbol)['previousClose']}}</li>
-            </ul>
-        </div>
-        <div class="buy-section">
-            <h2>Buy</h2>
-            <div class="buy-input-container">
-                <label for="stocksInput">No. of Stocks:</label>
-                <input type="number" id="stocksInput" value="0" min="0">
-                <input type="range" id="stocksSlider" min="0" max="1000" value="0">
-            </div>
-                <div style="display: flex;align-items: center; margin-top: -10px;">
-                <button id="buyButton" style="height: 35px; width: 60px;">Buy</button>
-                <h3 style="margin-left: 600px;">Your Balance: Rs. {{curr_balance}}</h3>
-            </div>
-        </div>
-        <div class="popup"></div>
-        <div class="overlay"></div>
-        <div class="sell-section">
-            <h2>Sell</h2>
-            <div class="sell-input-container">
-                <label for="stocksToSell">No. of Stocks:</label>
-                <input type="number" id="stocksToSell" value="0" min="0">
-                <input type="range" id="sellSlider" min="0" max="1000" value="0">
-            </div>
-            <button id="sellButton">Sell</button>
-            <div class="popup"></div>
-            <div class="overlay"></div>
-        </div>
-    </div>
 
-    <div class="right-side">
-        <h2 style="margin-top: 200px;">Compare Stocks</h2>
-        <table id="compare-table">
-            <tr>
-                <td class="compare-section">
-                    <label class="compare-label" for="stockNameInput">Stock Name:</label>
-                    <input class="compare-input" type="text" id="stockNameInput" placeholder="Enter stock name">
-                    <div class="stock-suggestions" id="stockSuggestions"></div>
-                </td>
-            </tr>
-            <tr>
-                <td class="compare-section">
-                    <label>Select Criteria:</label>
-                    <div class="criteria-list" id="criteriaList">
-                        <div class="criteria-item">
-                            <input type="radio" name="criteria" id="criteriaOpen" value="Price">
-                            <label for="criteriaPrice" class="criteria-label">Opening Price</label>
-                        </div>
-                        <div class="criteria-item">
-                            <input type="radio" name="criteria" id="criteriaClose" value="Volume">
-                            <label for="criteriaVolume" class="criteria-label">Closing Price</label>
-                        </div>
-                        <div class="criteria-item">
-                            <input type="radio" name="criteria" id="criteriaVolume" value="Price">
-                            <label for="criteriaPrice" class="criteria-label">Volume</label>
-                        </div>
-                        <div class="criteria-item">
-                            <input type="radio" name="criteria" id="criteria52H" value="Volume">
-                            <label for="criteriaVolume" class="criteria-label">52 Week High</label>
-                        </div>
-                        <div class="criteria-item">
-                            <input type="radio" name="criteria" id="criteria52L" value="Volume">
-                            <label for="criteriaVolume" class="criteria-label">52 Week Low</label>
-                        </div>
+            <!-- Buy card -->
+            <div class="card trade-card">
+                <h2 class="card-title">
+                    <span class="card-title-icon buy-icon">&#8679;</span> Buy Shares
+                </h2>
+                <div class="trade-body">
+                    <div class="trade-row">
+                        <label for="stocksInput">Number of shares</label>
+                        <input type="number" id="stocksInput" class="trade-input" value="0" min="0">
                     </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <button class="add-stock-button" id="addStockButton" onclick="add_stock(this)">Add Stock</button>
-                </td>
-            </tr>
-        </table>
-        <button class="refresh" onclick="refresh_graph()">
-            Refresh Original Graph
-        </button>
+                    <input type="range" id="stocksSlider" class="slider buy-slider" min="0" max="1000" value="0">
+                    <div class="trade-cost-row">
+                        <span class="trade-cost-label">Estimated Cost</span>
+                        <span class="trade-cost" id="buyCost">&#8377; 0.00</span>
+                    </div>
+                    <button id="buyButton" class="btn-action btn-buy">Buy Now</button>
+                </div>
+                <div class="popup" id="buyPopup"></div>
+                <div class="overlay" id="buyOverlay"></div>
+            </div>
+
+        </div>
+
+        <!-- ── Right column ────────────────────────────── -->
+        <div class="col-right">
+
+            <!-- Balance card -->
+            <div class="card balance-card">
+                <div class="balance-pill">Available Balance</div>
+                <div class="balance-display" id="balanceDisplay">{{ curr_balance | inr }}</div>
+                <p class="balance-sub">Virtual trading funds</p>
+                <div class="balance-bar">
+                    <div class="balance-bar-fill"></div>
+                </div>
+            </div>
+
+            <!-- Sell card -->
+            <div class="card trade-card">
+                <div class="sell-header">
+                    <h2 class="card-title" style="margin-bottom:0;">
+                        <span class="card-title-icon sell-icon">&#8681;</span> Sell Shares
+                    </h2>
+                    <span class="owned-badge" id="ownedBadge">
+                        {% set owned = curr_stocks.get(symbol, 0) %}
+                        You own <strong>{{ owned | int }}</strong>
+                    </span>
+                </div>
+                <div class="trade-body" style="margin-top:16px;">
+                    <div class="trade-row">
+                        <label for="stocksToSell">Number of shares</label>
+                        <input type="number" id="stocksToSell" class="trade-input" value="0" min="0">
+                    </div>
+                    <input type="range" id="sellSlider" class="slider sell-slider" min="0" max="1000" value="0">
+                    <div class="trade-cost-row">
+                        <span class="trade-cost-label">Estimated Revenue</span>
+                        <span class="trade-cost" id="sellRevenue">&#8377; 0.00</span>
+                    </div>
+                    <button id="sellButton" class="btn-action btn-sell">Sell Now</button>
+                </div>
+                <div class="popup" id="sellPopup"></div>
+                <div class="overlay" id="sellOverlay"></div>
+            </div>
+
+        </div>
+
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script>
-        $('#drop').load('/watchlist');
-        console.log('is_candle',{{is_candle|lower}})
-        function changeTimeButton(button, time) {
-           
-            document.querySelectorAll('.time-buttons button').forEach(btn => {
-                btn.classList.remove('active');
-            });
 
-           
-            button.classList.add('active');
+</div>
 
-            
-            console.log(`Selected Time: ${time}`);
-            $.ajax({url:'/update_graph_time',type:'POST',data:{'time':time},success:function(data){location.reload();}});
-            location.reload();
-        }
+<!-- ── Footer ────────────────────────────────────────────────────── -->
+<footer class="site-footer">
+    <span>Golden Harbor &copy; 2026 &nbsp;&bull;&nbsp; Virtual trading platform &bull;&nbsp; NSE data</span>
+</footer>
 
-        function toggleImage() {
-            
-            const imageElement = document.getElementById('toggleImage');
-            const currentImage = imageElement.src;
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+$('#drop').load('/watchlist');
 
-            // if (currentImage.includes("{{ url_for('static', filename='line.png') }}")) {
-            //     imageElement.src = "{{ url_for('static', filename='candle.png') }}";
-            // } else {
-            //     imageElement.src = "{{ url_for('static', filename='line.png') }}";
-            // }
-            
-           
-            $.ajax({url:'/update_candle',type:'POST',success:function(data){location.reload();}})
-            console.log('Toggle Image Button Pressed');
-        }
-        
-        document.getElementById('stocksSlider').addEventListener('input', function () {
-            document.getElementById('stocksInput').value = this.value;
+const stockDatabase = {{ all | safe }};
+var livePrice = {{ live['lastPrice'] }};
+
+// ── Live price auto-refresh ────────────────────────────────────────
+(function() {
+    var sym = '{{ symbol }}';
+    function refreshLivePrice() {
+        $.getJSON('/api/live_prices', { symbols: sym }, function(data) {
+            if (!data[sym]) return;
+            var d = data[sym];
+            livePrice = parseFloat(d.lastPrice) || livePrice;
+            // Update price display
+            var fmtN = function(v) { var n = parseFloat(v); return isNaN(n) ? (v || 'N/A') : n.toFixed(2); };
+            document.getElementById('live-price-display').textContent = '\u00a0\u20B9\u00a0' + fmtN(d.lastPrice);
+            // Update change badge
+            var chg = parseFloat(d.change);
+            var el  = document.getElementById('live-change-display');
+            if (el) {
+                el.className = 'lp-change ' + (chg >= 0 ? 'pos' : 'neg');
+                el.innerHTML = (chg >= 0 ? '&#9650;' : '&#9660;') + ' ' + fmtN(d.change) + '\u00a0(' + fmtN(d.pChange) + '%)';
+            }
+            // Recalculate shown cost/revenue with new price
+            var bqty = parseInt(document.getElementById('stocksInput').value) || 0;
+            document.getElementById('buyCost').textContent = fmtInr(livePrice * bqty);
+            var sqty = parseInt(document.getElementById('stocksToSell').value) || 0;
+            document.getElementById('sellRevenue').textContent = fmtInr(livePrice * sqty);
         });
-    
-       
-        document.getElementById('buyButton').addEventListener('click', function () {
-            console.log('Buy button clicked!');
-       
-            const numberOfStocks = document.getElementById('stocksInput').value;
-            console.log('val',numberOfStocks);
-            
-            $.ajax({url:'/update_buy',type:'POST',data:{st:'{{symbol}}',pr:{{f(symbol)['lastPrice']}},q:numberOfStocks}});
-            // Display the popup with a message
-            const popup = document.querySelector('.popup');
-            const overlay = document.querySelector('.overlay');
+    }
+    setInterval(refreshLivePrice, 15000);
+})();
 
-            popup.innerHTML = `Buy successful! You have purchased ${numberOfStocks} stocks.`;
-            popup.style.display = 'block';
-            overlay.style.display = 'block';
+// ── Search ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    const inp  = document.getElementById('search-input');
+    const sugg = document.getElementById('searchSuggestions');
+    const btn  = document.getElementById('search-btn');
 
-            document.getElementById('stocksInput').value = 0;
-            document.getElementById('stocksSlider').value = 0;
+    inp.addEventListener('input', function () {
+        const q = inp.value.toLowerCase();
+        const m = stockDatabase.filter(s => s.toLowerCase().includes(q));
+        sugg.innerHTML = '';
+        m.forEach(s => {
+            const d = document.createElement('div');
+            d.textContent = s; d.className = 'search-suggestion';
+            d.addEventListener('click', () => { inp.value = s; sugg.innerHTML = ''; sugg.style.display = 'none'; });
+            sugg.appendChild(d);
         });
+        sugg.style.display = m.length ? 'block' : 'none';
+    });
+    document.addEventListener('click', e => {
+        if (!e.target.closest('#searchSuggestions') && !e.target.closest('#search-input'))
+            sugg.style.display = 'none';
+    });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); btn.click(); } });
+    btn.addEventListener('click', function () {
+        var st = inp.value; inp.value = ''; sugg.style.display = 'none';
+        $.ajax({ url: '/link_stock_graph', type: 'POST', data: { st },
+            success: d => { window.location.href = '/allindexes/' + d; } });
+    });
+});
 
-        
-        document.querySelector('.overlay').addEventListener('click', function () {
-            document.querySelector('.popup').style.display = 'none';
-            document.querySelector('.overlay').style.display = 'none';
-        });
+// ── Watchlist ──────────────────────────────────────────────────────
+var isWatchlisted = {{ iswatch | lower }};
+var sym1 = "{{ all_stocks.index[all_stocks['Symbol'] == symbol][0] }}";
 
-       
-        document.getElementById('sellSlider').addEventListener('input', function () {
-            document.getElementById('stocksToSell').value = this.value;
-        });
+document.getElementById('watchlistButton').addEventListener('click', function () {
+    isWatchlisted = !isWatchlisted;
+    const wText = document.getElementById('watchlistText');
+    const wBtn  = document.getElementById('watchlistButton');
+    if (isWatchlisted) {
+        wText.textContent = '✔ Watchlisted'; wBtn.classList.add('wl-active');
+        $('#watch').find('a:contains("Empty !")').remove();
+        $.ajax({ url: '/link_stock_graph', type: 'POST', data: { st: sym1 }, success: function (d) {
+            $('#watch').append('<a href=/allindexes/' + d + '>' + sym1 + '</a>');
+            $.ajax({ url: '/update_watch', type: 'POST', data: { new_state: $('#watch').html(), st: sym1 } });
+        }});
+    } else {
+        wText.textContent = '+ Watchlist'; wBtn.classList.remove('wl-active');
+        $('#watch').find('a:contains("' + sym1 + '")').remove();
+        if ($('#watch').children().length === 0) $('#watch').append('<a href="#">Empty !</a>');
+        $.ajax({ url: '/update_watch', type: 'POST', data: { new_state: $('#watch').html(), st1: sym1 } });
+    }
+});
 
-        
-        document.getElementById('sellButton').addEventListener('click', function () {
-            // Retrieve the number of stocks to sell from the input
-            const numberOfStocksToSell = document.getElementById('stocksToSell').value;
-            $.ajax({url:'/update_sell',type:'POST',data:{st:'{{symbol}}',pr:{{f(symbol)['lastPrice']}},q:numberOfStocksToSell}});
-            // Display the sell popup with a message
-            const sellPopup = document.querySelector('.sell-section .popup');
-            const sellOverlay = document.querySelector('.sell-section .overlay');
+// ── Helpers ────────────────────────────────────────────────────────
+function fmtInr(v) { return '\u20B9\u00A0' + v.toLocaleString('en-IN', { minimumFractionDigits: 2 }); }
 
-            sellPopup.innerHTML = `Sell successful! You have sold ${numberOfStocksToSell} stocks.`;
-            sellPopup.style.display = 'block';
-            sellOverlay.style.display = 'block';
+var ownedQty = {{ (curr_stocks.get(symbol, 0)) | int }};
+var currentBalance = {{ curr_balance }};
 
-            document.getElementById('sellSlider').value = 0;
-            document.getElementById('stocksToSell').value = 0;
-        });
+function updateBalanceDisplay(newBal) {
+    currentBalance = newBal;
+    var el = document.getElementById('balanceDisplay');
+    if (el) el.textContent = fmtInr(newBal);
+}
 
-        
-        document.querySelector('.sell-section .overlay').addEventListener('click', function () {
-            document.querySelector('.sell-section .popup').style.display = 'none';
-            document.querySelector('.sell-section .overlay').style.display = 'none';
-        });
+function showPopup(popId, ovId, html) {
+    var pop = document.getElementById(popId), ov = document.getElementById(ovId);
+    pop.innerHTML = html; pop.style.display = 'block'; ov.style.display = 'block';
+}
 
-        const watchlistButton = document.getElementById('watchlistButton');
-        const watchlistText = document.getElementById('watchlistText');
-        
-        var isWatchlisted = {{iswatch|lower}};
-        var watch=$('#watch');
-        var sym1 = "{{ all_stocks.index[all_stocks['Symbol'] == symbol][0] }}";
-        // if(watch.find('a:contains("' + sym1 + '")').length>0){
-        //     console.log('hihihi');
-        //     isWatchlisted=true;
-        //     watchlistText.innerText = '✔ Watchlisted';
-        // } 
-        
-            
-        var f=true;
-        watchlistButton.addEventListener('click', function () {
-            isWatchlisted = !isWatchlisted; // Toggle the watchlist status
-            var name="{{ all_stocks.index[all_stocks['Symbol'] == symbol][0]}}";
-            if (isWatchlisted) {
-                watchlistText.innerText = '✔ Watchlisted';
-                var watch=$('#watch');
-                watch.find('a:contains("' + "Empty !" + '")').remove();
-                $.ajax({url:'/link_stock_graph',type:'POST',data:{'st':"{{ all_stocks.index[all_stocks['Symbol'] == symbol][0]}}"},success:function(data){
-                    var link="/allindexes/"+data;
-                    watch.append('<a href='+link+'>' +"{{ all_stocks.index[all_stocks['Symbol'] == symbol][0]}}" +'</a>');
-                    //console.log('hello','<a href='+link+ '>' +button.id +'</a>');
-                    var new_state=$('#watch').html();
-                    console.log("hi",new_state);
-                    $.ajax({url: '/update_watch',type:'POST',data: {new_state:new_state,st:name},success: function(data){console.log('hi');}});
-                }});
-                
-                
-              
+// ── Buy ────────────────────────────────────────────────────────────
+document.getElementById('stocksSlider').addEventListener('input', function () {
+    document.getElementById('stocksInput').value = this.value;
+    document.getElementById('buyCost').textContent = fmtInr(livePrice * parseInt(this.value || 0));
+});
+document.getElementById('stocksInput').addEventListener('input', function () {
+    document.getElementById('stocksSlider').value = this.value;
+    document.getElementById('buyCost').textContent = fmtInr(livePrice * parseInt(this.value || 0));
+});
+document.getElementById('buyButton').addEventListener('click', function () {
+    const qty = parseInt(document.getElementById('stocksInput').value) || 0;
+    if (qty <= 0) return;
+    const cost = livePrice * qty;
+    if (cost > currentBalance) {
+        showPopup('buyPopup', 'buyOverlay',
+            `<div class="popup-icon err">&#10006;</div>
+             <strong>Insufficient Balance</strong>
+             <div class="popup-detail">Cost: ${fmtInr(cost)}<br>Available: ${fmtInr(currentBalance)}</div>`);
+        return;
+    }
+    $.ajax({ url: '/update_buy', type: 'POST', data: { st: '{{symbol}}', pr: livePrice, q: qty },
+        success: function (data) {
+            if (data.status === 'error') {
+                showPopup('buyPopup', 'buyOverlay',
+                    `<div class="popup-icon err">&#10006;</div>
+                     <strong>Insufficient Balance</strong>
+                     <div class="popup-detail">Cost: ${fmtInr(data.cost)}<br>Available: ${fmtInr(data.balance)}</div>`);
             } else {
-                var watch=$('#watch');
-                watch.find('a:contains("' + "{{ all_stocks.index[all_stocks['Symbol'] == symbol][0]}}" + '")').remove();
-                
-                console.log("w",watch.length);
-                if(watch.children().length==0){
-                    watch.append('<a href="#">Empty !</a>');
-                }
-                var new_state=$('#watch').html();
-                console.log("hi",new_state);
-                $.ajax({url: '/update_watch',type:'POST',data: {new_state:new_state,st1:name}});
-                watchlistText.innerText = 'Watchlist';
+                ownedQty += qty;
+                document.getElementById('sellSlider').max = ownedQty;
+                document.getElementById('stocksToSell').max = ownedQty;
+                document.getElementById('ownedBadge').innerHTML = 'You own <strong>' + ownedQty + '</strong>';
+                updateBalanceDisplay(data.balance);
+                showPopup('buyPopup', 'buyOverlay',
+                    `<div class="popup-icon ok">&#10003;</div>
+                     <strong>Buy Successful!</strong>
+                     <div class="popup-detail">Bought <b>${qty}</b> share(s) &times; &#8377;${livePrice}<br>New Balance: ${fmtInr(data.balance)}</div>`);
+                document.getElementById('stocksInput').value = 0;
+                document.getElementById('stocksSlider').value = 0;
+                document.getElementById('buyCost').textContent = '\u20B9 0.00';
             }
-        });
-    </script>
-    <!-- resolution JS removed -->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script>
-       
-    //    console.log("hi :",{{ all | safe}});
-        const  stockDatabase = {{ all| safe}};
+        }
+    });
+});
+document.getElementById('buyOverlay').addEventListener('click', function () {
+    document.getElementById('buyPopup').style.display = 'none'; this.style.display = 'none';
+});
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const stockNameInput = document.getElementById('stockNameInput');
-            const stockSuggestions = document.getElementById('stockSuggestions');
-            const criteriaList = document.getElementById('criteriaList');
-            const addStockButton = document.getElementById('addStockButton');
+// ── Sell ───────────────────────────────────────────────────────────
+document.getElementById('sellSlider').max = ownedQty;
+document.getElementById('stocksToSell').max = ownedQty;
 
-            
-
-        stockNameInput.addEventListener('input', function () {
-            const inputText = stockNameInput.value.toLowerCase();
-            const suggestions = stockDatabase.filter(stock => stock.toLowerCase().includes(inputText));
-
-           
-            stockSuggestions.innerHTML = '';
-            suggestions.forEach(suggestion => {
-                const suggestionDiv = document.createElement('div');
-                suggestionDiv.textContent = suggestion;
-                suggestionDiv.classList.add('stock-suggestion');  // Add the class here
-                suggestionDiv.addEventListener('click', function () {
-                    stockNameInput.value = suggestion;
-                    stockSuggestions.innerHTML = ''; // Clear suggestions after selection
-                });
-                stockSuggestions.appendChild(suggestionDiv);
-            });
-
-            
-            stockSuggestions.style.display = suggestions.length ? 'block' : 'none';
-        });
-
-            
-            document.addEventListener('click', function (event) {
-                if (!event.target.closest('#stockSuggestions') && !event.target.closest('#stockNameInput')) {
-                    stockSuggestions.style.display = 'none';
-                }
-            });
-            
-            
-            
-            addStockButton.addEventListener('click', function () {
-                
-                const selectedCriteria = document.querySelector('input[name="criteria"]:checked');
-                const selectedCriteriaValue = selectedCriteria ? selectedCriteria.value : null;
-
-                
-                const selectedStockName = stockNameInput.value;
-                console.log(`Selected Stock Name: ${selectedStockName}`);
-                console.log(`Selected Criteria: ${selectedCriteriaValue}`);
-
-                
-                stockNameInput.value = '';
-                stockSuggestions.innerHTML = '';
-               
-                document.querySelectorAll('input[name="criteria"]').forEach(radio => (radio.checked = false));
-            });
-        });
-    </script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.getElementById('search-input');
-            const searchSuggestions = document.getElementById('searchSuggestions');
-
-            searchInput.addEventListener('input', function () {
-                const inputText = searchInput.value.toLowerCase();
-                
-                const suggestions = {{all|safe}}.filter(item => item.toLowerCase().includes(inputText));
-
-                searchSuggestions.innerHTML = '';
-                suggestions.forEach(suggestion => {
-                    const suggestionDiv = document.createElement('div');
-                    suggestionDiv.textContent = suggestion;
-                    suggestionDiv.classList.add('search-suggestion');
-                    suggestionDiv.addEventListener('click', function () {
-                        searchInput.value = suggestion;
-                        searchSuggestions.innerHTML = '';
-                    });
-                    searchSuggestions.appendChild(suggestionDiv);
-                });
-
-                searchSuggestions.style.display = suggestions.length ? 'block' : 'none';
-            });
-
-            document.addEventListener('click', function (event) {
-                if (!event.target.closest('#searchSuggestions') && !event.target.closest('#search-input')) {
-                    searchSuggestions.style.display = 'none';
-                }
-                
-            });
-
-            const searchBtn = document.getElementById('search-btn');
-            // Pressing Enter in the input should behave the same as clicking the search button
-            searchInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    searchBtn.click();
-                }
-            });
-
-            searchBtn.addEventListener('click', function () {
-                var st=searchInput.value;
-                searchInput.value = '';
-
-                
-                searchSuggestions.style.display = 'none';
-
-                
-                const searchText = searchInput.value;
-                console.log(`Search button clicked with text: ${searchText}`);
-                $.ajax({url:'/link_stock_graph',type:'POST',data:{'st':st},success:function(data){window.location.href="/allindexes/"+data;}});
-                
-                // console.log('hehe',sym);
-                // window.location.href="/allindexes/"+sym;
-            });
-        });
-    </script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script>
-             
-            function add_stock(button){
-                var st=$('#stockNameInput').val();
-                
-                console.log("HIHIHIH",st);
-                $.ajax({url:'/update_graph',type:'POST',data:{'st':st},success:function(data){location.reload();}});
+document.getElementById('sellSlider').addEventListener('input', function () {
+    document.getElementById('stocksToSell').value = this.value;
+    document.getElementById('sellRevenue').textContent = fmtInr(livePrice * parseInt(this.value || 0));
+});
+document.getElementById('stocksToSell').addEventListener('input', function () {
+    if (parseInt(this.value) > ownedQty) this.value = ownedQty;
+    document.getElementById('sellSlider').value = this.value;
+    document.getElementById('sellRevenue').textContent = fmtInr(livePrice * parseInt(this.value || 0));
+});
+document.getElementById('sellButton').addEventListener('click', function () {
+    const qty = parseInt(document.getElementById('stocksToSell').value) || 0;
+    if (qty <= 0) return;
+    if (qty > ownedQty) {
+        showPopup('sellPopup', 'sellOverlay',
+            `<div class="popup-icon err">&#10006;</div>
+             <strong>Cannot Sell</strong>
+             <div class="popup-detail">You own <b>${ownedQty}</b> share(s).<br>Cannot sell <b>${qty}</b>.</div>`);
+        return;
+    }
+    $.ajax({ url: '/update_sell', type: 'POST', data: { st: '{{symbol}}', pr: livePrice, q: qty },
+        success: function (data) {
+            if (data.status === 'error') {
+                showPopup('sellPopup', 'sellOverlay',
+                    `<div class="popup-icon err">&#10006;</div>
+                     <strong>Cannot Sell</strong>
+                     <div class="popup-detail">You own <b>${data.owned}</b> share(s).<br>Cannot sell <b>${data.requested}</b>.</div>`);
+            } else {
+                ownedQty -= qty;
+                document.getElementById('sellSlider').max = ownedQty;
+                document.getElementById('stocksToSell').max = ownedQty;
+                document.getElementById('ownedBadge').innerHTML = 'You own <strong>' + ownedQty + '</strong>';
+                updateBalanceDisplay(data.balance);
+                showPopup('sellPopup', 'sellOverlay',
+                    `<div class="popup-icon ok">&#10003;</div>
+                     <strong>Sell Successful!</strong>
+                     <div class="popup-detail">Sold <b>${qty}</b> share(s) &times; &#8377;${livePrice}<br>New Balance: ${fmtInr(data.balance)}</div>`);
+                document.getElementById('stocksToSell').value = 0;
+                document.getElementById('sellSlider').value = 0;
+                document.getElementById('sellRevenue').textContent = '\u20B9 0.00';
             }
-
-            function refresh_graph(){
-                var st="{{ all_stocks.index[all_stocks['Symbol'] == symbol][0]}}";
-                $.ajax({url:'/link_stock_graph',type:'POST',data:{'st':st},success:function(data){window.location.href="/allindexes/"+data;}});
-            }
-
-           
-    </script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script>
-        $('#criteriaOpen').change(function() {
-             if ($(this).is(':checked')) {
-              
-                console.log('Price radio button is selected');
-                $.ajax({url:'/selector',type:'POST',data:{select:'OPEN'}});
-            }
-        });
-        $('#criteriaClose').change(function() {
-             if ($(this).is(':checked')) {
-              
-                console.log('Price radio button is selected');
-                $.ajax({url:'/selector',type:'POST',data:{select:'CLOSE'}});
-            }
-        });
-        $('#criteriaVolume').change(function() {
-             if ($(this).is(':checked')) {
-              
-                console.log('Price radio button is selected');
-                $.ajax({url:'/selector',type:'POST',data:{select:'VOLUME'}});
-            }
-        });
-        $('#criteria52H').change(function() {
-             if ($(this).is(':checked')) {
-              
-                console.log('Price radio button is selected');
-                $.ajax({url:'/selector',type:'POST',data:{select:'52W H'}});
-            }
-        });
-        $('#criteria52L').change(function() {
-             if ($(this).is(':checked')) {
-              
-                console.log('Price radio button is selected');
-                $.ajax({url:'/selector',type:'POST',data:{select:'52W L'}});
-            }
-        });
-    </script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script>
-        // function buy(){
-        //     var quan=$('#stocksInput').value;
-        //     console.log('val',quan);
-        //     $.ajax({url:'/update_buy',type:'POST',data:{st:'{{symbol}}',pr:5,q:quan}});
-        // }
-    </script>
+        }
+    });
+});
+document.getElementById('sellOverlay').addEventListener('click', function () {
+    document.getElementById('sellPopup').style.display = 'none'; this.style.display = 'none';
+});
+</script>
 </body>
 </html>
