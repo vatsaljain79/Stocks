@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from jugaad_data.nse import NSELive, stock_df as jugaad_stock_df
 from sqlalchemy import JSON   # generic — works with both SQLite and PostgreSQL
@@ -10,12 +9,8 @@ from datetime import date
 import time, random
 import os, requests as http_requests
 import yfinance as yf
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
 
 app.secret_key = os.getenv('SECRET_KEY', 'dev-only-fallback-secret')
 
